@@ -115,8 +115,16 @@ nav button[aria-current="page"]{background:var(--tint);color:var(--accent);font-
 
 <script>
 /* ---------- core: data and logic, no DOM ---------- */
-const STORES = {harter:"Harter House", cmart:"Country Mart", aldi:"Aldi"};
-const STORE_KEYS = ["harter","cmart","aldi"];
+const STORES = {harter:"Harter House", cmart:"Country Mart", aldi:"Aldi", heb:"H-E-B", albertsons:"Albertsons"};
+const STORE_SHORT = {harter:"Harter", cmart:"C. Mart", aldi:"Aldi", heb:"HEB", albertsons:"Albert."};
+const DEFAULT_STORES = ["harter","cmart","aldi"];
+let STORE_KEYS = DEFAULT_STORES.slice();
+function syncStores(o){
+  const a = Object.keys(STORES).filter(k => Array.isArray(o.stores) && o.stores.includes(k));
+  o.stores = a.length ? a : DEFAULT_STORES.slice();
+  STORE_KEYS = o.stores.slice();
+  if (!STORE_KEYS.includes(o.pref)) o.pref = STORE_KEYS[0];
+}
 const MEATS = ["fish","chicken","beef","bacon"];
 const MEAT_LABEL = {fish:"Fish", chicken:"Chicken", beef:"Beef", bacon:"Bacon"};
 const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
@@ -151,7 +159,7 @@ function rItems(r){ return r.items.filter(id => ITEM_BY[id]); }
 const fits = (r, t) => r.type === t || r.type === "any";
 
 function defaults(){
-  return {v:2, updatedAt:0, budget:40, pref:"harter", threshold:0.5,
+  return {v:2, updatedAt:0, budget:40, pref:"harter", stores:DEFAULT_STORES.slice(), threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
     prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}};
@@ -164,7 +172,7 @@ function normalize(s){
   ["extras","custom","last"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
   const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
-  if (!STORES[o.pref]) o.pref = "harter";
+  syncStores(o);
   if (typeof o.budget !== "number" || !(o.budget >= 0)) o.budget = 40;
   if (typeof o.threshold !== "number" || !(o.threshold >= 0)) o.threshold = 0.5;
   return o;
@@ -202,7 +210,7 @@ function priceFor(id, store){
    (a logged price, or a sale), and the preferred price is a real one or the other is a sale. */
 function bestStore(id){
   const ov = state.overrides[id];
-  if (ov && STORES[ov]) return ov;
+  if (ov && STORE_KEYS.includes(ov)) return ov;
   let best = state.pref;
   const p = priceFor(id, best);
   let bestP = p.price;
@@ -463,13 +471,15 @@ function viewPrices(){
   }
   h += `<div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap"><button class="btn ghost" data-act="checkdata">Check for updates</button>
     <span class="small muted">Meals and ads from ${esc(dataUpdated || "the app")}. ${esc(ui.dataMsg)}</span></div></section>`;
+  h += `<section class="card"><h2>My stores</h2><div class="small muted">Check the stores you shop at. Prices for stores other than the ones in the weekly ads start as estimates; type in real prices in the price book below as you see them.</div>
+    <div class="ings">${Object.keys(STORES).map(k => `<label class="item"><input type="checkbox" data-act="storetoggle" data-s="${k}"${STORE_KEYS.includes(k) ? " checked" : ""}><span class="n">${esc(STORES[k])}</span></label>`).join("")}</div></section>`;
   h += `<section class="card"><h2>Store rules</h2>
     <div class="row" style="gap:10px"><label for="pref2" class="small muted" style="flex:1">Preferred store</label>
       <select id="pref2" data-act="pref" style="width:auto">${storeOptions(state.pref)}</select></div>
     <div class="row" style="gap:10px;margin-top:8px"><label for="thr" class="small muted" style="flex:1">Go elsewhere only if cheaper by $</label>
       <input id="thr" data-act="thr" type="number" inputmode="decimal" step="0.25" min="0" value="${state.threshold}" style="width:80px"></div>
     <div class="small muted" style="margin-top:8px">An item moves off your preferred store only when another store has a real logged price or a sale that beats it by that much. Use the store menu on any shopping row to override one item.</div></section>`;
-  h += `<h3>Price book</h3><section class="card" style="padding:8px 10px"><table class="pb"><thead><tr><th style="width:34%">Item</th>${STORE_KEYS.map(s => `<th>${s === "cmart" ? "C. Mart" : s === "harter" ? "Harter" : "Aldi"}</th>`).join("")}</tr></thead><tbody>` +
+  h += `<h3>Price book</h3><section class="card" style="padding:8px 10px"><table class="pb"><thead><tr><th style="width:34%">Item</th>${STORE_KEYS.map(s => `<th>${STORE_SHORT[s]}</th>`).join("")}</tr></thead><tbody>` +
     ITEMS.map(i => `<tr><td><div class="pn">${esc(i.name)}</div><div class="tiny muted">est. ${money(i.est)}</div>
       <select data-act="ovr" data-id="${esc(i.id)}" aria-label="Always buy ${esc(i.name)} at"><option value="">Auto</option>${STORE_KEYS.map(s => `<option value="${s}"${state.overrides[i.id] === s ? " selected" : ""}>${STORES[s]}</option>`).join("")}</select></td>` +
       STORE_KEYS.map(s => { const v = (state.prices[i.id] || {})[s]; return `<td><input type="number" inputmode="decimal" step="0.01" min="0" data-act="price" data-id="${esc(i.id)}" data-s="${s}" value="${typeof v === "number" ? v : ""}" placeholder="-" aria-label="${esc(i.name)} at ${STORES[s]}"></td>`; }).join("") + `</tr>`).join("") +
@@ -593,6 +603,11 @@ document.addEventListener("change", ev => {
   else if (a === "check") { if (el.checked) state.checked[id] = true; else delete state.checked[id]; }
   else if (a === "budget") { const n = parseMoney(el.value); if (n !== null) state.budget = n; }
   else if (a === "pref") { state.pref = el.value; }
+  else if (a === "storetoggle") {
+    const k = el.dataset.s, cur = state.stores.slice();
+    const next = el.checked ? (cur.includes(k) ? cur : cur.concat(k)) : cur.filter(x => x !== k);
+    state.stores = next; syncStores(state);
+  }
   else if (a === "thr") { const n = parseMoney(el.value); if (n !== null) state.threshold = n; }
   else if (a === "ovr") { if (el.value) state.overrides[id] = el.value; else delete state.overrides[id]; }
   else if (a === "move") {
@@ -627,7 +642,7 @@ document.addEventListener("change", ev => {
   setData(data); // so the saved state can be checked against real meals
   const local = loadLocal();
   const firstRun = !local;
-  state = local || defaults();
+  state = local || defaults(); syncStores(state);
   applyData(data);
   if (state.plan.every(x => x == null)) { fillPlan(true, false); save(); }
   render(); setStatus();
