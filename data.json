@@ -1,5 +1,5 @@
 {
- "version": 3,
+ "version": 4,
  "updated": "2026-11-15",
  "items": [
   {
@@ -386,6 +386,27 @@
    "unit": "bag",
    "cat": "Pantry",
    "est": 5.0
+  },
+  {
+   "id": "shortening",
+   "name": "Crisco shortening",
+   "unit": "can",
+   "cat": "Pantry",
+   "est": 4.5
+  },
+  {
+   "id": "buttermilk",
+   "name": "Buttermilk",
+   "unit": "quart",
+   "cat": "Dairy & eggs",
+   "est": 2.5
+  },
+  {
+   "id": "bakingsoda",
+   "name": "Baking soda",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 1.0
   }
  ],
  "recipes": [

@@ -1,5 +1,5 @@
 {
- "version": 5,
+ "version": 6,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -80,6 +80,47 @@
    ],
    "images": [
     "family/herod-potato-cake-1.jpg"
+   ]
+  },
+  {
+   "id": "herod-devil-food-cake",
+   "title": "Devil Food Cake",
+   "from": "Grandma Herod",
+   "sharedBy": "Jessica",
+   "type": "dessert",
+   "servings": "Five layers",
+   "note": "From Grandma Pauline Herod's handwritten recipes. The photo cuts off right at \"Bake\", so the oven temperature and time are still to be added.",
+   "ingredients": [
+    "2 cups white sugar",
+    "1 cup Crisco",
+    "1 cup buttermilk (sour)",
+    "1/2 cup cocoa",
+    "3 cups flour (sifted)",
+    "1/2 cup boiling water",
+    "2 eggs",
+    "1 teaspoon vanilla",
+    "1/4 teaspoon salt",
+    "1 teaspoon soda"
+   ],
+   "steps": [
+    "Cream the sugar and Crisco. Add the eggs and beat until fluffy.",
+    "Sift together the flour, salt and cocoa.",
+    "Add the soda with the milk and beat.",
+    "Add the vanilla and the boiling water. Beat until smooth.",
+    "Pour into five layer pans. Bake (the rest of this line is cut off in the photo)."
+   ],
+   "items": [
+    "sugar",
+    "shortening",
+    "buttermilk",
+    "chocolate",
+    "flour",
+    "bakingsoda",
+    "vanilla",
+    "eggs"
+   ],
+   "images": [
+    "family/herod-devil-food-cake-1.jpg"
    ]
   }
  ]
