@@ -1,1 +1,30 @@
-{"version":1,"updated":null,"recipes":[]}
+{
+ "version": 2,
+ "updated": "2026-11-15",
+ "recipes": [
+  {
+   "id": "herod-pecan-pie",
+   "title": "Pecan Pie",
+   "from": "Grandma Pauline Herod",
+   "sharedBy": "Jessica",
+   "note": "From Grandma Pauline Herod's handwritten recipe card.",
+   "ingredients": [
+    "1 cup Karo all-purpose syrup",
+    "3 eggs, slightly beaten",
+    "1/8 teaspoon salt",
+    "1 teaspoon vanilla",
+    "1 cup sugar",
+    "2 tablespoons margarine, melted",
+    "1 cup pecans, halved or chopped",
+    "1 unbaked 9-inch pastry shell"
+   ],
+   "steps": [
+    "Mix all ingredients for the filling together, adding the pecans last.",
+    "Pour into the pastry shell.",
+    "Bake in a 400°F (hot) oven for 15 minutes.",
+    "Reduce the heat to 350°F (moderate) and bake 30 to 35 minutes longer.",
+    "The pie is done when the outer edge of the filling is set and the center is slightly soft."
+   ]
+  }
+ ]
+}
