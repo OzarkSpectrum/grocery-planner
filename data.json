@@ -1,5 +1,5 @@
 {
- "version": 5,
+ "version": 6,
  "updated": "2026-11-15",
  "items": [
   {
@@ -448,6 +448,111 @@
    "name": "French fried onions",
    "unit": "can",
    "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "salt",
+   "name": "Salt",
+   "unit": "canister",
+   "cat": "Spices",
+   "est": 1.0
+  },
+  {
+   "id": "pepper",
+   "name": "Black pepper",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "cinnamon",
+   "name": "Cinnamon",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "nutmeg",
+   "name": "Nutmeg",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 4.0
+  },
+  {
+   "id": "cloves",
+   "name": "Cloves",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 4.0
+  },
+  {
+   "id": "cumin",
+   "name": "Cumin",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "chilipowder",
+   "name": "Chili powder",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "paprika",
+   "name": "Paprika",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "garlicpowder",
+   "name": "Garlic powder",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "onionpowder",
+   "name": "Onion powder",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "italian",
+   "name": "Italian seasoning",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "oregano",
+   "name": "Oregano",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "cayenne",
+   "name": "Cayenne pepper",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.0
+  },
+  {
+   "id": "ginger",
+   "name": "Ground ginger",
+   "unit": "jar",
+   "cat": "Spices",
+   "est": 3.5
+  },
+  {
+   "id": "bayleaves",
+   "name": "Bay leaves",
+   "unit": "jar",
+   "cat": "Spices",
    "est": 3.0
   }
  ],

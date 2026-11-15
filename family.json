@@ -1,5 +1,5 @@
 {
- "version": 8,
+ "version": 9,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -37,7 +37,8 @@
     "vanilla",
     "pecans",
     "margarine",
-    "piecrust"
+    "piecrust",
+    "salt"
    ]
   },
   {
@@ -76,7 +77,11 @@
     "bakingpowder",
     "raisins",
     "mincemeat",
-    "nuts"
+    "nuts",
+    "salt",
+    "cinnamon",
+    "nutmeg",
+    "cloves"
    ],
    "images": [
     "family/herod-potato-cake-1.jpg"
@@ -117,7 +122,8 @@
     "flour",
     "bakingsoda",
     "vanilla",
-    "eggs"
+    "eggs",
+    "salt"
    ],
    "images": [
     "family/herod-devil-food-cake-1.jpg"
