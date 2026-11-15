@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "updated": "2026-11-15",
  "items": [
   {
@@ -295,6 +295,48 @@
    "unit": "12 oz",
    "cat": "Meat & fish",
    "est": 5.5
+  },
+  {
+   "id": "sugar",
+   "name": "Sugar",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "karo",
+   "name": "Corn syrup (Karo)",
+   "unit": "bottle",
+   "cat": "Pantry",
+   "est": 3.5
+  },
+  {
+   "id": "vanilla",
+   "name": "Vanilla extract",
+   "unit": "bottle",
+   "cat": "Pantry",
+   "est": 5.0
+  },
+  {
+   "id": "pecans",
+   "name": "Pecans",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 6.0
+  },
+  {
+   "id": "margarine",
+   "name": "Margarine",
+   "unit": "tub",
+   "cat": "Dairy & eggs",
+   "est": 2.5
+  },
+  {
+   "id": "piecrust",
+   "name": "Pie crust",
+   "unit": "each",
+   "cat": "Frozen",
+   "est": 3.0
   }
  ],
  "recipes": [

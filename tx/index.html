@@ -165,9 +165,11 @@ function normalizeAds(a){
   return out;
 }
 function eff(r){ const e = state.edits && state.edits[r.id]; return e ? Object.assign({}, r, e, {edited:true}) : r; }
-function allRecipesAll(){ return RECIPES.map(eff).concat(state.custom || []); }
+function famAsMeal(r){ return {id:"f_" + r.id, name:r.title, type:r.type, meat:r.meat || null, items:r.items, family:true}; }
+function famPool(){ return (FAMILY.recipes || []).filter(r => Array.isArray(r.items) && r.items.length && ["lunch","dinner","any"].includes(r.type)).map(famAsMeal); }
+function allRecipesAll(){ return RECIPES.map(eff).concat(state.custom || [], famPool()); }
 function allRecipes(){ const h = state.hidden || []; return allRecipesAll().filter(r => !h.includes(r.id)); }
-function recipeById(id){ return RECIPE_BY[id] ? eff(RECIPE_BY[id]) : ((state.custom || []).find(r => r.id === id) || null); }
+function recipeById(id){ return RECIPE_BY[id] ? eff(RECIPE_BY[id]) : ((state.custom || []).find(r => r.id === id) || famPool().find(r => r.id === id) || null); }
 function rItems(r){ return r.items.filter(id => ITEM_BY[id]); }
 const fits = (r, t) => r.type === t || r.type === "any";
 
@@ -175,15 +177,15 @@ function defaults(){
   return {v:2, updatedAt:0, budget:40, pref:"heb", stores:DEFAULT_STORES.slice(), threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
-    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[], famSeen:[]};
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[], famSeen:[], famList:[]};
 }
 let state = defaults();
 function normalize(s){
   const o = Object.assign(defaults(), s || {});
   o.meats = Object.assign(defaults().meats, o.meats || {});
   ["pantry","prices","overrides","checked","actual","edits"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
-  ["extras","custom","last","hidden","myItems","famSeen"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
-  const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
+  ["extras","custom","last","hidden","myItems","famSeen","famList"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id) || famPool().some(r => r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
   o.myItems = o.myItems.filter(i => i && i.id && i.name && CATS.includes(i.cat) && typeof i.est === "number");
   syncStores(o);
@@ -239,9 +241,11 @@ function bestStore(id){
 }
 const itemCost = id => priceFor(id, bestStore(id)).price;
 
+function famListRecipes(){ const l = state.famList || []; return (FAMILY.recipes || []).filter(r => l.includes(r.id)); }
 function planIds(){
   const s = new Set();
   state.plan.forEach(rid => { const r = rid && recipeById(rid); if (r) rItems(r).forEach(i => s.add(i)); });
+  famListRecipes().forEach(r => (r.items || []).forEach(i => { if (ITEM_BY[i]) s.add(i); }));
   return s;
 }
 function neededIds(){ return [...planIds()].filter(i => !state.pantry[i]); }
@@ -401,6 +405,8 @@ function viewShop(){
       <div><div class="tiny muted">Planned</div><div class="big">${money(t.planned)}</div></div>
       <div style="text-align:right"><div class="tiny muted">Spent so far</div><div class="big">${t.anyActual ? money(t.spent) : "$0.00"}</div></div></div>
       <div class="small muted" style="margin-top:8px">Type the price from the shelf or receipt. It also goes into your price book.</div></section>`;
+  const fl = famListRecipes();
+  if (fl.length) h += `<section class="card"><div class="small muted">Includes ingredients for family recipes: ${fl.map(r => esc(r.title)).join(", ")}. Remove them under Meals, Family recipes.</div></section>`;
   if (!entries.length) h += `<p class="empty">Nothing to buy yet. Plan some meals first, or add an extra item below.</p>`;
   order.forEach(s => {
     const list = entries.filter(e => e.store === s);
@@ -433,10 +439,10 @@ function viewShop(){
 function mealLine(r){
   const names = rItems(r).map(id => ITEM_BY[id].name.toLowerCase()).join(", ");
   const tag = r.type === "lunch" ? "Lunch" : r.type === "dinner" ? "Dinner" : "Lunch or dinner";
-  return `<div class="mrow"><div><div style="font-weight:500">${esc(r.name)}</div><div class="tiny muted">${r.edited ? "Edited · " : ""}${esc(tag)}${names ? " · " + esc(names) : ""}</div></div>` +
+  return `<div class="mrow"><div><div style="font-weight:500">${esc(r.name)}</div><div class="tiny muted">${r.edited ? "Edited · " : ""}${r.family ? "Family · " : ""}${esc(tag)}${names ? " · " + esc(names) : ""}</div></div>` +
     `<div class="row" style="gap:6px">` + ((state.hidden || []).includes(r.id)
       ? `<button class="btn ghost mini" data-act="showmeal" data-id="${esc(r.id)}">Restore</button>`
-      : `<button class="btn ghost mini" data-act="editmeal" data-id="${esc(r.id)}">Edit</button>` +
+      : (r.family ? "" : `<button class="btn ghost mini" data-act="editmeal" data-id="${esc(r.id)}">Edit</button>`) +
         (r.custom ? `<button class="btn ghost mini" data-act="removemeal" data-id="${esc(r.id)}">Remove</button>` : `<button class="btn ghost mini" data-act="hidemeal" data-id="${esc(r.id)}">Hide</button>`)) + `</div></div>`;
 }
 function mealForm(){
@@ -464,10 +470,11 @@ function validFam(d){
 function famUnseen(){ const seen = new Set(state.famSeen || []); return FAMILY.recipes.filter(r => !seen.has(r.id)); }
 function famRecipe(r){
   const isNew = !!ui.famNew[r.id];
-  return `<details class="fam"><summary><b>${esc(r.title)}</b>${isNew ? ' <span class="tag sale">New</span>' : ""}
+  return `<details class="fam" data-id="${esc(r.id)}"><summary><b>${esc(r.title)}</b>${isNew ? ' <span class="tag sale">New</span>' : ""}
     <div class="tiny muted">${r.from ? "From " + esc(r.from) : ""}${r.from && r.sharedBy ? " · " : ""}${r.sharedBy ? "Shared by " + esc(r.sharedBy) : ""}${r.servings ? " · " + esc(r.servings) : ""}</div></summary>
     ${r.note ? `<div class="small muted" style="margin-top:6px">${esc(r.note)}</div>` : ""}
     <div class="small muted" style="margin-top:8px">Ingredients</div><ul>${r.ingredients.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    ${Array.isArray(r.items) && r.items.length ? `<div class="btns"><button class="btn ${(state.famList || []).includes(r.id) ? "" : "ghost"}" data-act="famlist" data-id="${esc(r.id)}">${(state.famList || []).includes(r.id) ? "On this week's shopping list (tap to remove)" : "Add ingredients to my shopping list"}</button></div>` : ""}
     <div class="small muted">Directions</div><ol>${r.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
     ${(r.images || []).length ? `<div class="small muted" style="margin-top:8px">The original card</div>` + r.images.map(u => `<img src="${esc(FAM_BASE + u)}" alt="Handwritten recipe card for ${esc(r.title)}" style="width:100%;border-radius:10px;margin-top:8px">`).join("") : ""}</details>`;
 }
@@ -608,13 +615,18 @@ async function copyList(){
   if (ok) { const el = $("sync"); if (el) { el.textContent = "List copied"; el.className = "sync ok"; setTimeout(setStatus, 2000); } }
   render();
 }
-const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","openfam","closefam","additem","delitem","fillpantry","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
+const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","famlist","openfam","closefam","additem","delitem","fillpantry","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
 document.addEventListener("click", ev => {
   const el = ev.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; if (!CLICK_ACTS.has(a)) return;
   if (a !== "newweek" && ui.confirmNew) ui.confirmNew = false;
-  if (a === "tab") { ui.tab = el.dataset.tab; ui.copyText = ""; ui.confirmNew = false; render(); window.scrollTo(0, 0); return; }
+  if (a === "tab") { ui.tab = el.dataset.tab; ui.copyText = ""; ui.confirmNew = false; ui.fam = false; render(); window.scrollTo(0, 0); return; }
   if (a === "meat") { const m = el.dataset.m; state.meats[m] = !state.meats[m]; fillPlan(true, false); save(); render(); return; }
+  if (a === "famlist") {
+    const id = el.dataset.id, i = state.famList.indexOf(id);
+    if (i >= 0) state.famList.splice(i, 1); else state.famList.push(id);
+    save(); const o = document.querySelector('details.fam[data-id="' + id + '"]'); const open = o && o.open; render(); const n = document.querySelector('details.fam[data-id="' + id + '"]'); if (n && open) n.open = true; return;
+  }
   if (a === "openfam") { ui.fam = true; ui.famFilter = ""; ui.famNew = {}; famUnseen().forEach(r => { ui.famNew[r.id] = true; }); state.famSeen = FAMILY.recipes.map(r => r.id); save(); render(); window.scrollTo(0, 0); return; }
   if (a === "closefam") { ui.fam = false; render(); window.scrollTo(0, 0); return; }
   if (a === "additem") {
@@ -646,7 +658,7 @@ document.addEventListener("click", ev => {
     if (!ui.confirmNew) { ui.confirmNew = true; render(); return; }
     ui.confirmNew = false;
     state.last = [...new Set(state.plan.filter(Boolean))];
-    state.plan = new Array(10).fill(null); state.checked = {}; state.actual = {}; state.extras = [];
+    state.plan = new Array(10).fill(null); state.checked = {}; state.actual = {}; state.extras = []; state.famList = [];
     state.meats = {fish:false,chicken:false,beef:false,bacon:false};
     fillPlan(true, false); save(); render(); window.scrollTo(0, 0); return;
   }

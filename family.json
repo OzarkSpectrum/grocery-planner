@@ -1,5 +1,5 @@
 {
- "version": 3,
+ "version": 4,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -28,6 +28,16 @@
    "images": [
     "family/herod-pecan-pie-1.jpg",
     "family/herod-pecan-pie-2.jpg"
+   ],
+   "type": "dessert",
+   "items": [
+    "eggs",
+    "sugar",
+    "karo",
+    "vanilla",
+    "pecans",
+    "margarine",
+    "piecrust"
    ]
   }
  ]
