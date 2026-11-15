@@ -1,5 +1,5 @@
 {
- "version": 7,
+ "version": 8,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -122,6 +122,63 @@
    "images": [
     "family/herod-devil-food-cake-1.jpg"
    ]
+  },
+  {
+   "id": "green-bean-casserole",
+   "title": "Green Bean Casserole",
+   "from": "Jessica",
+   "sharedBy": "Jessica",
+   "type": "side",
+   "ingredients": [
+    "2 cans string green beans (pat dry)",
+    "Small Velveeta",
+    "1 can cream of mushroom soup (do not add water or milk)",
+    "1 small bag of French fried onions"
+   ],
+   "steps": [
+    "Spread the green beans into a 9x13 casserole dish.",
+    "Melt the cheese with the soup and pour over the green beans.",
+    "Bake at 350° for 30 minutes.",
+    "Spread the French fried onions on top and bake another 5-10 minutes.",
+    "To double it, just double the ingredients."
+   ],
+   "items": [
+    "greenbeans",
+    "velveeta",
+    "mushsoup",
+    "friedonions"
+   ],
+   "submittedAt": "11/15/2026 17:33:02"
+  },
+  {
+   "id": "taco-turnovers",
+   "title": "Taco Turnovers",
+   "from": "Rebecca",
+   "sharedBy": "Crackle Dackle",
+   "type": "dinner",
+   "meat": "beef",
+   "note": "Kids favorite, great with sour cream!",
+   "ingredients": [
+    "1/2 lb ground beef",
+    "Half a white onion",
+    "1 pack taco seasoning",
+    "1 Pillsbury croissant roll",
+    "Shredded cheese (for the top)"
+   ],
+   "steps": [
+    "Cook the ground beef.",
+    "Fill the croissants with the mixture.",
+    "Add shredded cheese on top.",
+    "Bake at 375 for 15 minutes."
+   ],
+   "items": [
+    "beef",
+    "onions",
+    "tacoseason",
+    "croissants",
+    "cheese"
+   ],
+   "submittedAt": "11/15/2026 17:36:27"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "version": 4,
+ "version": 5,
  "updated": "2026-11-15",
  "items": [
   {
@@ -407,6 +407,48 @@
    "unit": "box",
    "cat": "Pantry",
    "est": 1.0
+  },
+  {
+   "id": "tacoseason",
+   "name": "Taco seasoning",
+   "unit": "packet",
+   "cat": "Pantry",
+   "est": 1.0
+  },
+  {
+   "id": "croissants",
+   "name": "Crescent roll dough",
+   "unit": "can",
+   "cat": "Bakery",
+   "est": 3.5
+  },
+  {
+   "id": "greenbeans",
+   "name": "Green beans (canned)",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "velveeta",
+   "name": "Velveeta cheese",
+   "unit": "small block",
+   "cat": "Dairy & eggs",
+   "est": 4.5
+  },
+  {
+   "id": "mushsoup",
+   "name": "Cream of mushroom soup",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.5
+  },
+  {
+   "id": "friedonions",
+   "name": "French fried onions",
+   "unit": "can",
+   "cat": "Pantry",
+   "est": 3.0
   }
  ],
  "recipes": [
