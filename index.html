@@ -144,8 +144,9 @@ function normalizeAds(a){
   if (a && Array.isArray(a.items)) out.items = a.items.filter(x => x && STORES[x.store] && typeof x.price === "number");
   return out;
 }
-function allRecipes(){ return RECIPES.concat(state.custom || []); }
-function recipeById(id){ return RECIPE_BY[id] || (state.custom || []).find(r => r.id === id) || null; }
+function eff(r){ const e = state.edits && state.edits[r.id]; return e ? Object.assign({}, r, e, {edited:true}) : r; }
+function allRecipes(){ return RECIPES.map(eff).concat(state.custom || []); }
+function recipeById(id){ return RECIPE_BY[id] ? eff(RECIPE_BY[id]) : ((state.custom || []).find(r => r.id === id) || null); }
 function rItems(r){ return r.items.filter(id => ITEM_BY[id]); }
 const fits = (r, t) => r.type === t || r.type === "any";
 
@@ -153,13 +154,13 @@ function defaults(){
   return {v:2, updatedAt:0, budget:40, pref:"harter", threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
-    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[]};
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}};
 }
 let state = defaults();
 function normalize(s){
   const o = Object.assign(defaults(), s || {});
   o.meats = Object.assign(defaults().meats, o.meats || {});
-  ["pantry","prices","overrides","checked","actual"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
+  ["pantry","prices","overrides","checked","actual","edits"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
   ["extras","custom","last"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
   const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
@@ -288,7 +289,7 @@ function fillPlan(replaceForMeat, shuffle){
 /* ---------- app: storage, screens, updates ---------- */
 const LS_KEY = "grocery-planner-v2";
 const LS_DATA = "grocery-planner-data";
-const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, mealErr:"", dataMsg:""};
+const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, mealErr:"", dataMsg:""};
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -403,26 +404,30 @@ function viewShop(){
 function mealLine(r){
   const names = rItems(r).map(id => ITEM_BY[id].name.toLowerCase()).join(", ");
   const tag = r.type === "lunch" ? "Lunch" : r.type === "dinner" ? "Dinner" : "Lunch or dinner";
-  return `<div class="mrow"><div><div style="font-weight:500">${esc(r.name)}</div><div class="tiny muted">${esc(tag)}${names ? " · " + esc(names) : ""}</div></div>` +
-    (r.custom ? `<button class="btn ghost mini" data-act="removemeal" data-id="${esc(r.id)}">Remove</button>` : "") + `</div>`;
+  return `<div class="mrow"><div><div style="font-weight:500">${esc(r.name)}</div><div class="tiny muted">${r.edited ? "Edited · " : ""}${esc(tag)}${names ? " · " + esc(names) : ""}</div></div>` +
+    `<div class="row" style="gap:6px"><button class="btn ghost mini" data-act="editmeal" data-id="${esc(r.id)}">Edit</button>` +
+    (r.custom ? `<button class="btn ghost mini" data-act="removemeal" data-id="${esc(r.id)}">Remove</button>` : "") + `</div></div>`;
 }
 function mealForm(){
-  return `<section class="card"><h2>New meal</h2>
-    <label class="small muted" for="mname">Name</label><input id="mname" type="text" placeholder="Rice and eggs" style="width:100%">
+  const ed = ui.editId ? recipeById(ui.editId) : null;
+  const sel = (v, cur) => v === cur ? " selected" : "";
+  return `<section class="card"><h2>${ed ? "Edit meal" : "New meal"}</h2>
+    <label class="small muted" for="mname">Name</label><input id="mname" type="text" placeholder="Rice and eggs" value="${ed ? esc(ed.name) : ""}" style="width:100%">
     <div class="row" style="gap:8px;margin-top:10px"><div style="flex:1"><label class="small muted" for="mtype">When</label>
-      <select id="mtype"><option value="any">Lunch or dinner</option><option value="lunch">Lunch</option><option value="dinner">Dinner</option></select></div>
+      <select id="mtype"><option value="any"${sel("any", ed && ed.type)}>Lunch or dinner</option><option value="lunch"${sel("lunch", ed && ed.type)}>Lunch</option><option value="dinner"${sel("dinner", ed && ed.type)}>Dinner</option></select></div>
       <div style="flex:1"><label class="small muted" for="mmeat">Contains</label>
-      <select id="mmeat"><option value="">No meat or fish</option>${MEATS.map(m => `<option value="${m}">${MEAT_LABEL[m]}</option>`).join("")}</select></div></div>
+      <select id="mmeat"><option value="">No meat or fish</option>${MEATS.map(m => `<option value="${m}"${sel(m, ed && ed.meat)}>${MEAT_LABEL[m]}</option>`).join("")}</select></div></div>
     <div class="small muted" style="margin-top:10px">Ingredients</div>
-    <div class="ings">${ITEMS.map(i => `<label class="item"><input type="checkbox" class="ing" value="${esc(i.id)}"><span class="n">${esc(i.name)}</span></label>`).join("")}</div>
+    <div class="ings">${ITEMS.map(i => `<label class="item"><input type="checkbox" class="ing" value="${esc(i.id)}"${ed && ed.items.includes(i.id) ? " checked" : ""}><span class="n">${esc(i.name)}</span></label>`).join("")}</div>
     <div class="small muted">Missing an ingredient? Ask Claude to add it to the shared list.</div>
     ${ui.mealErr ? `<div class="err">${esc(ui.mealErr)}</div>` : ""}
-    <div class="btns"><button class="btn" data-act="savemeal">Save meal</button><button class="btn ghost" data-act="cancelmeal">Cancel</button></div></section>`;
+    <div class="btns"><button class="btn" data-act="savemeal">Save meal</button><button class="btn ghost" data-act="cancelmeal">Cancel</button>
+    ${ed && ed.edited ? `<button class="btn ghost" data-act="resetmeal">Reset to original</button>` : ""}</div></section>`;
 }
 function viewMeals(){
   const recs = allRecipes();
   let h = `<section class="card"><h2>${recs.length} meals</h2>
-    <div class="small muted">The planner picks from these. Add your own and it will start using them too.</div>
+    <div class="small muted">The planner picks from these. Tap Edit on any meal to change it, or add your own.</div>
     <div class="btns"><button class="btn" data-act="addmeal">Add my own meal</button></div></section>`;
   if (ui.addMeal) h += mealForm();
   const groups = [["My meals", r => r.custom], ["Vegetarian", r => !r.custom && !r.meat], ["Fish", r => !r.custom && r.meat === "fish"],
@@ -525,7 +530,7 @@ async function copyList(){
   if (ok) { const el = $("sync"); if (el) { el.textContent = "List copied"; el.className = "sync ok"; setTimeout(setStatus, 2000); } }
   render();
 }
-const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","checkdata"]);
+const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","editmeal","resetmeal","checkdata"]);
 document.addEventListener("click", ev => {
   const el = ev.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; if (!CLICK_ACTS.has(a)) return;
@@ -556,15 +561,21 @@ document.addEventListener("click", ev => {
     state.extras = state.extras.filter(x => x.id !== id); delete state.checked[id]; delete state.actual[id];
     save(); render(); return;
   }
-  if (a === "addmeal") { ui.addMeal = true; ui.mealErr = ""; render(); const n = $("mname"); if (n) n.focus(); return; }
-  if (a === "cancelmeal") { ui.addMeal = false; ui.mealErr = ""; render(); return; }
+  if (a === "editmeal") { ui.addMeal = true; ui.editId = el.dataset.id; ui.mealErr = ""; render(); window.scrollTo(0, 0); return; }
+  if (a === "resetmeal") { delete state.edits[ui.editId]; ui.addMeal = false; ui.editId = null; ui.mealErr = ""; save(); render(); return; }
+  if (a === "addmeal") { ui.addMeal = true; ui.editId = null; ui.mealErr = ""; render(); const n = $("mname"); if (n) n.focus(); return; }
+  if (a === "cancelmeal") { ui.addMeal = false; ui.editId = null; ui.mealErr = ""; render(); return; }
   if (a === "savemeal") {
     const name = ($("mname").value || "").trim();
     const items = [...document.querySelectorAll(".ing")].filter(c => c.checked).map(c => c.value);
     if (!name) { ui.mealErr = "Give the meal a name."; render(); return; }
     if (!items.length) { ui.mealErr = "Pick at least one ingredient."; render(); return; }
-    state.custom.push({id:"c" + Date.now().toString(36), name, type:$("mtype").value, meat:$("mmeat").value || null, items, custom:true});
-    ui.addMeal = false; ui.mealErr = ""; save(); render(); return;
+    const vals = {name, type:$("mtype").value, meat:$("mmeat").value || null, items};
+    if (ui.editId) {
+      const c = state.custom.find(r => r.id === ui.editId);
+      if (c) Object.assign(c, vals); else state.edits[ui.editId] = vals;
+    } else state.custom.push(Object.assign({id:"c" + Date.now().toString(36), custom:true}, vals));
+    ui.addMeal = false; ui.editId = null; ui.mealErr = ""; save(); render(); return;
   }
   if (a === "removemeal") {
     const id = el.dataset.id;
