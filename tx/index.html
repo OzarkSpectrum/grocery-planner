@@ -137,9 +137,15 @@ let ITEMS = [], RECIPES = [], ITEM_BY = {}, RECIPE_BY = {};
 let curVersion = 0, dataUpdated = null;
 let ads = {updated:null, items:[]};
 
-function setData(d){
-  ITEMS = d.items.slice(); RECIPES = d.recipes.slice();
+let BASE_ITEMS = [];
+function rebuildItems(){
+  const mine = (state.myItems || []).map(i => Object.assign({}, i, {mine:true}));
+  ITEMS = BASE_ITEMS.concat(mine);
   ITEM_BY = {}; ITEMS.forEach(i => ITEM_BY[i.id] = i);
+}
+function setData(d){
+  BASE_ITEMS = d.items.slice(); RECIPES = d.recipes.slice();
+  rebuildItems();
   RECIPE_BY = {}; RECIPES.forEach(r => RECIPE_BY[r.id] = r);
 }
 function validData(d){
@@ -163,16 +169,17 @@ function defaults(){
   return {v:2, updatedAt:0, budget:40, pref:"heb", stores:DEFAULT_STORES.slice(), threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
-    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[]};
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[]};
 }
 let state = defaults();
 function normalize(s){
   const o = Object.assign(defaults(), s || {});
   o.meats = Object.assign(defaults().meats, o.meats || {});
   ["pantry","prices","overrides","checked","actual","edits"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
-  ["extras","custom","last","hidden"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  ["extras","custom","last","hidden","myItems"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
   const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
+  o.myItems = o.myItems.filter(i => i && i.id && i.name && CATS.includes(i.cat) && typeof i.est === "number");
   syncStores(o);
   if (typeof o.budget !== "number" || !(o.budget >= 0)) o.budget = 40;
   if (typeof o.threshold !== "number" || !(o.threshold >= 0)) o.threshold = 0.5;
@@ -253,7 +260,7 @@ function totals(){
 
 /* Fill the week. Each toggled meat gets one meal; everything else is vegetarian, chosen by lowest added cost,
    with a penalty for repeats and for last week's meals, plus a little randomness so weeks differ. */
-function fillPlan(replaceForMeat, shuffle){
+function fillPlan(replaceForMeat, shuffle, pantryOnly){
   const rnd = shuffle ? 2.5 : 1.0;
   state.plan = state.plan.map(rid => { const r = rid && recipeById(rid); return (r && r.meat && !state.meats[r.meat]) ? null : (r ? rid : null); });
   const uses = {};
@@ -268,7 +275,7 @@ function fillPlan(replaceForMeat, shuffle){
   const dinnerOrder = [7, 3, 9, 5, 1]; // Thu, Tue, Fri, Wed, Mon dinners
   const lunchOrder = [6, 4, 8, 2];
   const present = new Set(state.plan.map(r => r && recipeById(r)).filter(r => r && r.meat).map(r => r.meat));
-  const recs = allRecipes();
+  const recs = allRecipes().filter(r => !pantryOnly || (rItems(r).length > 0 && rItems(r).every(id => state.pantry[id])));
   for (const m of MEATS) {
     if (!state.meats[m] || present.has(m)) continue;
     let slot = dinnerOrder.find(s => state.plan[s] == null);
@@ -298,7 +305,7 @@ function fillPlan(replaceForMeat, shuffle){
 /* ---------- app: storage, screens, updates ---------- */
 const LS_KEY = "grocery-planner-v2";
 const LS_DATA = "grocery-planner-data";
-const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, mealErr:"", dataMsg:""};
+const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, itemErr:"", planMsg:"", mealErr:"", dataMsg:""};
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -352,6 +359,7 @@ function viewPlan(){
     <div class="row" style="margin-top:6px"><label class="small muted" for="pref">Shop first at</label>
       <select id="pref" data-act="pref" style="width:auto">${storeOptions(state.pref)}</select></div>
     <div class="btns"><button class="btn" data-act="fill">Fill empty meals</button><button class="btn ghost" data-act="shuffle">Shuffle all</button><button class="btn ghost" data-act="clear">Clear</button></div>
+    <div class="btns" style="margin-top:8px"><button class="btn ghost" data-act="fillpantry">Use up my pantry</button></div>${ui.planMsg ? `<div class="small muted" style="margin-top:8px">${esc(ui.planMsg)}</div>` : ""}
   </section>`;
   for (let d = 0; d < 5; d++) {
     h += `<section class="card day"><div class="dn">${DAYS[d]}</div>
@@ -363,14 +371,20 @@ function viewPantry(){
   const used = planIds();
   const have = ITEMS.filter(i => state.pantry[i.id]).length;
   let h = `<section class="card"><h2>What I have on hand</h2>
-    <div class="small muted">Switch on what is already in your kitchen. Those items drop off your shopping list and the planner favors meals that use them. ${have} on hand now.</div></section>`;
+    <div class="small muted">Switch on what is already in your kitchen. Those items drop off your shopping list and the planner favors meals that use them. ${have} on hand now.</div></section>
+    <section class="card"><h2>Add something not on the list</h2>
+    <div class="small muted">Seasonings, kimchi, garden or seasonal items. They show up here and in the meal builder.</div>
+    <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><input id="uname" type="text" placeholder="Item (kimchi, smoked paprika...)" style="flex:2;min-width:140px">
+      <select id="ucat" style="flex:1;min-width:110px">${CATS.map(c => `<option value="${esc(c)}"${c === "Pantry" ? " selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
+    <div class="row" style="gap:8px;margin-top:8px"><input id="uprice" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Price if I buy it (optional)" style="flex:1">
+      <button class="btn" data-act="additem">Add</button></div>${ui.itemErr ? `<div class="err">${esc(ui.itemErr)}</div>` : ""}</section>`;
   CATS.forEach(c => {
     const list = ITEMS.filter(i => i.cat === c);
     if (!list.length) return;
     h += `<h3>${esc(c)}</h3><section class="card" style="padding:4px 14px">` + list.map(i => `
       <label class="item"><input type="checkbox" data-act="pantry" data-id="${esc(i.id)}"${state.pantry[i.id] ? " checked" : ""}>
-        <span class="nm"><span class="n">${esc(i.name)}</span> <span class="muted small">${esc(i.unit)}</span>
-        ${used.has(i.id) ? '<div class="tiny muted">In this week\'s plan</div>' : ""}</span></label>`).join("") + `</section>`;
+        <span class="nm"><span class="n">${esc(i.name)}</span> <span class="muted small">${esc(i.unit || "")}</span>
+        ${used.has(i.id) ? '<div class="tiny muted">In this week\'s plan</div>' : ""}</span>${i.mine ? `<button class="btn ghost mini" data-act="delitem" data-id="${esc(i.id)}">Remove</button>` : ""}</label>`).join("") + `</section>`;
   });
   return h;
 }
@@ -545,16 +559,36 @@ async function copyList(){
   if (ok) { const el = $("sync"); if (el) { el.textContent = "List copied"; el.className = "sync ok"; setTimeout(setStatus, 2000); } }
   render();
 }
-const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
+const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","additem","delitem","fillpantry","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
 document.addEventListener("click", ev => {
   const el = ev.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; if (!CLICK_ACTS.has(a)) return;
   if (a !== "newweek" && ui.confirmNew) ui.confirmNew = false;
   if (a === "tab") { ui.tab = el.dataset.tab; ui.copyText = ""; ui.confirmNew = false; render(); window.scrollTo(0, 0); return; }
   if (a === "meat") { const m = el.dataset.m; state.meats[m] = !state.meats[m]; fillPlan(true, false); save(); render(); return; }
-  if (a === "fill") { fillPlan(true, false); save(); render(); return; }
-  if (a === "shuffle") { state.plan = new Array(10).fill(null); fillPlan(true, true); save(); render(); return; }
-  if (a === "clear") { state.plan = new Array(10).fill(null); state.checked = {}; save(); render(); return; }
+  if (a === "additem") {
+    const name = ($("uname").value || "").trim(); const pr = parseMoney($("uprice").value);
+    if (!name) { ui.itemErr = "Give the item a name."; render(); return; }
+    if (ITEMS.some(i => i.name.toLowerCase() === name.toLowerCase())) { ui.itemErr = "That one is already on the list."; render(); return; }
+    const id = "u" + Date.now().toString(36);
+    state.myItems.push({id, name, unit:"", cat:$("ucat").value, est:(pr !== null ? pr : 0)});
+    state.pantry[id] = true; ui.itemErr = ""; rebuildItems(); save(); render(); return;
+  }
+  if (a === "delitem") {
+    const id = el.dataset.id;
+    state.myItems = state.myItems.filter(i => i.id !== id); delete state.pantry[id]; delete state.prices[id]; delete state.overrides[id];
+    state.custom.forEach(r => { r.items = r.items.filter(x => x !== id); });
+    rebuildItems(); save(); render(); return;
+  }
+  if (a === "fillpantry") {
+    state.plan = new Array(10).fill(null); fillPlan(true, true, true);
+    const n = state.plan.filter(Boolean).length;
+    ui.planMsg = n === 10 ? "All 10 meals come from what you have on hand." : n === 0 ? "No meals can be made from what you have on hand yet. Check more items in Pantry." : `${n} of 10 meals can be made from what you have. Add more to Pantry for more options.`;
+    save(); render(); return;
+  }
+  if (a === "fill") { ui.planMsg = ""; fillPlan(true, false); save(); render(); return; }
+  if (a === "shuffle") { ui.planMsg = ""; state.plan = new Array(10).fill(null); fillPlan(true, true); save(); render(); return; }
+  if (a === "clear") { ui.planMsg = ""; state.plan = new Array(10).fill(null); state.checked = {}; save(); render(); return; }
   if (a === "copy") { copyList(); return; }
   if (a === "checkdata") { ui.dataMsg = "Checking..."; render(); fetchData(true); return; }
   if (a === "newweek") {
