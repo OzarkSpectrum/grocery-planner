@@ -1,0 +1,953 @@
+{
+ "version": 1,
+ "updated": "2026-11-15",
+ "items": [
+  {
+   "id": "onions",
+   "name": "Onions",
+   "unit": "bag",
+   "cat": "Produce",
+   "est": 1.5
+  },
+  {
+   "id": "garlic",
+   "name": "Garlic",
+   "unit": "head",
+   "cat": "Produce",
+   "est": 0.7
+  },
+  {
+   "id": "sweetp",
+   "name": "Sweet potatoes",
+   "unit": "2 or 3",
+   "cat": "Produce",
+   "est": 2.0
+  },
+  {
+   "id": "potatoes",
+   "name": "Potatoes",
+   "unit": "5 lb bag",
+   "cat": "Produce",
+   "est": 3.5
+  },
+  {
+   "id": "carrots",
+   "name": "Carrots",
+   "unit": "2 lb bag",
+   "cat": "Produce",
+   "est": 1.6
+  },
+  {
+   "id": "cabbage",
+   "name": "Cabbage",
+   "unit": "head",
+   "cat": "Produce",
+   "est": 2.0
+  },
+  {
+   "id": "peppers",
+   "name": "Bell peppers",
+   "unit": "2",
+   "cat": "Produce",
+   "est": 2.0
+  },
+  {
+   "id": "spinach",
+   "name": "Spinach",
+   "unit": "5 oz",
+   "cat": "Produce",
+   "est": 2.0
+  },
+  {
+   "id": "mushrooms",
+   "name": "Mushrooms",
+   "unit": "8 oz",
+   "cat": "Produce",
+   "est": 2.0
+  },
+  {
+   "id": "eggs",
+   "name": "Eggs",
+   "unit": "dozen",
+   "cat": "Dairy & eggs",
+   "est": 3.0
+  },
+  {
+   "id": "cheese",
+   "name": "Shredded cheese",
+   "unit": "8 oz",
+   "cat": "Dairy & eggs",
+   "est": 2.5
+  },
+  {
+   "id": "milk",
+   "name": "Milk",
+   "unit": "half gallon",
+   "cat": "Dairy & eggs",
+   "est": 2.5
+  },
+  {
+   "id": "bread",
+   "name": "Bread",
+   "unit": "loaf",
+   "cat": "Bakery",
+   "est": 1.5
+  },
+  {
+   "id": "tortillas",
+   "name": "Flour tortillas",
+   "unit": "8 count",
+   "cat": "Bakery",
+   "est": 2.0
+  },
+  {
+   "id": "rice",
+   "name": "Rice",
+   "unit": "2 lb",
+   "cat": "Pantry",
+   "est": 2.0
+  },
+  {
+   "id": "pasta",
+   "name": "Pasta",
+   "unit": "1 lb",
+   "cat": "Pantry",
+   "est": 1.3
+  },
+  {
+   "id": "lentils",
+   "name": "Dried lentils",
+   "unit": "1 lb",
+   "cat": "Pantry",
+   "est": 1.8
+  },
+  {
+   "id": "broth",
+   "name": "Veggie broth",
+   "unit": "carton",
+   "cat": "Pantry",
+   "est": 2.0
+  },
+  {
+   "id": "soy",
+   "name": "Soy sauce",
+   "unit": "bottle",
+   "cat": "Pantry",
+   "est": 2.5
+  },
+  {
+   "id": "mayo",
+   "name": "Mayo",
+   "unit": "jar",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "pb",
+   "name": "Peanut butter",
+   "unit": "jar",
+   "cat": "Pantry",
+   "est": 2.5
+  },
+  {
+   "id": "jelly",
+   "name": "Jelly",
+   "unit": "jar",
+   "cat": "Pantry",
+   "est": 2.0
+  },
+  {
+   "id": "macbox",
+   "name": "Mac and cheese box",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 1.0
+  },
+  {
+   "id": "ramen",
+   "name": "Ramen noodles",
+   "unit": "3 packs",
+   "cat": "Pantry",
+   "est": 1.0
+  },
+  {
+   "id": "cornbread",
+   "name": "Cornbread mix",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 1.0
+  },
+  {
+   "id": "blackbeans",
+   "name": "Black beans",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "whitebeans",
+   "name": "White beans",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "chickpeas",
+   "name": "Chickpeas",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "pinto",
+   "name": "Pinto beans",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "refried",
+   "name": "Refried beans",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.2
+  },
+  {
+   "id": "dtomatoes",
+   "name": "Diced tomatoes",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "tomsoup",
+   "name": "Tomato soup",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "marinara",
+   "name": "Marinara sauce",
+   "unit": "jar",
+   "cat": "Canned & jarred",
+   "est": 1.8
+  },
+  {
+   "id": "salsa",
+   "name": "Salsa",
+   "unit": "jar",
+   "cat": "Canned & jarred",
+   "est": 1.8
+  },
+  {
+   "id": "fmix",
+   "name": "Frozen mixed veggies",
+   "unit": "bag",
+   "cat": "Frozen",
+   "est": 1.5
+  },
+  {
+   "id": "broccoli",
+   "name": "Frozen broccoli",
+   "unit": "bag",
+   "cat": "Frozen",
+   "est": 1.5
+  },
+  {
+   "id": "fish",
+   "name": "Frozen white fish",
+   "unit": "bag",
+   "cat": "Meat & fish",
+   "est": 5.5
+  },
+  {
+   "id": "tuna",
+   "name": "Canned tuna",
+   "unit": "can",
+   "cat": "Meat & fish",
+   "est": 1.25
+  },
+  {
+   "id": "salmon",
+   "name": "Canned salmon",
+   "unit": "can",
+   "cat": "Meat & fish",
+   "est": 3.0
+  },
+  {
+   "id": "chicken",
+   "name": "Chicken breast",
+   "unit": "1 lb",
+   "cat": "Meat & fish",
+   "est": 4.0
+  },
+  {
+   "id": "beef",
+   "name": "Ground beef",
+   "unit": "1 lb",
+   "cat": "Meat & fish",
+   "est": 6.0
+  },
+  {
+   "id": "bacon",
+   "name": "Bacon",
+   "unit": "12 oz",
+   "cat": "Meat & fish",
+   "est": 5.5
+  }
+ ],
+ "recipes": [
+  {
+   "id": "eggsalad",
+   "name": "Egg salad sandwich",
+   "type": "lunch",
+   "meat": null,
+   "items": [
+    "eggs",
+    "bread",
+    "mayo"
+   ]
+  },
+  {
+   "id": "chickpeasw",
+   "name": "Chickpea salad sandwich",
+   "type": "lunch",
+   "meat": null,
+   "items": [
+    "chickpeas",
+    "bread",
+    "mayo",
+    "onions"
+   ]
+  },
+  {
+   "id": "pbj",
+   "name": "Peanut butter and jelly sandwich",
+   "type": "lunch",
+   "meat": null,
+   "items": [
+    "pb",
+    "jelly",
+    "bread"
+   ]
+  },
+  {
+   "id": "pastasalad",
+   "name": "Cold pasta salad with cheese",
+   "type": "lunch",
+   "meat": null,
+   "items": [
+    "pasta",
+    "peppers",
+    "cheese"
+   ]
+  },
+  {
+   "id": "leftovers",
+   "name": "Leftovers from last night",
+   "type": "lunch",
+   "meat": null,
+   "items": [],
+   "minDay": 1
+  },
+  {
+   "id": "tunasw",
+   "name": "Tuna sandwich",
+   "type": "lunch",
+   "meat": "fish",
+   "items": [
+    "tuna",
+    "bread",
+    "mayo"
+   ]
+  },
+  {
+   "id": "tunamelt",
+   "name": "Tuna melt",
+   "type": "lunch",
+   "meat": "fish",
+   "items": [
+    "tuna",
+    "bread",
+    "cheese"
+   ]
+  },
+  {
+   "id": "chickenwrap",
+   "name": "Chicken wrap",
+   "type": "lunch",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "tortillas",
+    "salsa",
+    "cheese"
+   ]
+  },
+  {
+   "id": "chickensalad",
+   "name": "Chicken salad sandwich",
+   "type": "lunch",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "bread",
+    "mayo"
+   ]
+  },
+  {
+   "id": "baconegg",
+   "name": "Bacon and egg sandwich",
+   "type": "lunch",
+   "meat": "bacon",
+   "items": [
+    "bacon",
+    "eggs",
+    "bread"
+   ]
+  },
+  {
+   "id": "lentilsoup",
+   "name": "Lentil soup",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "lentils",
+    "onions",
+    "garlic",
+    "broth",
+    "carrots"
+   ]
+  },
+  {
+   "id": "grilledcheese",
+   "name": "Grilled cheese and tomato soup",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "bread",
+    "cheese",
+    "tomsoup"
+   ]
+  },
+  {
+   "id": "beanburrito",
+   "name": "Bean and cheese burrito",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "blackbeans",
+    "tortillas",
+    "cheese",
+    "salsa"
+   ]
+  },
+  {
+   "id": "veggiequesa",
+   "name": "Veggie quesadilla",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "tortillas",
+    "cheese",
+    "peppers",
+    "onions"
+   ]
+  },
+  {
+   "id": "blacksoup",
+   "name": "Black bean soup",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "blackbeans",
+    "onions",
+    "garlic",
+    "broth",
+    "salsa"
+   ]
+  },
+  {
+   "id": "bakedpotato",
+   "name": "Loaded baked potato with broccoli",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "potatoes",
+    "cheese",
+    "broccoli"
+   ]
+  },
+  {
+   "id": "macveg",
+   "name": "Mac and cheese with veggies",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "macbox",
+    "milk",
+    "fmix"
+   ]
+  },
+  {
+   "id": "beanrice",
+   "name": "Bean and rice bowl",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "blackbeans",
+    "rice",
+    "salsa",
+    "cheese"
+   ]
+  },
+  {
+   "id": "eggburrito",
+   "name": "Egg and cheese burrito",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "eggs",
+    "tortillas",
+    "cheese",
+    "salsa"
+   ]
+  },
+  {
+   "id": "pintocorn",
+   "name": "Pinto beans and cornbread",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "pinto",
+    "cornbread",
+    "onions"
+   ]
+  },
+  {
+   "id": "ramenegg",
+   "name": "Ramen with egg and veggies",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "ramen",
+    "eggs",
+    "fmix"
+   ]
+  },
+  {
+   "id": "tomatorice",
+   "name": "Tomato rice soup",
+   "type": "any",
+   "meat": null,
+   "items": [
+    "dtomatoes",
+    "rice",
+    "broth",
+    "onions"
+   ]
+  },
+  {
+   "id": "chickenquesa",
+   "name": "Chicken quesadilla",
+   "type": "any",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "tortillas",
+    "cheese",
+    "salsa"
+   ]
+  },
+  {
+   "id": "baconpotato",
+   "name": "Baked potato with bacon and cheese",
+   "type": "any",
+   "meat": "bacon",
+   "items": [
+    "potatoes",
+    "bacon",
+    "cheese"
+   ]
+  },
+  {
+   "id": "tacos",
+   "name": "Black bean and sweet potato tacos",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "blackbeans",
+    "sweetp",
+    "tortillas",
+    "cheese",
+    "onions",
+    "salsa"
+   ]
+  },
+  {
+   "id": "friedrice",
+   "name": "Veggie egg fried rice",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "rice",
+    "eggs",
+    "fmix",
+    "onions",
+    "soy"
+   ]
+  },
+  {
+   "id": "pastabeans",
+   "name": "Pasta with marinara and white beans",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "pasta",
+    "marinara",
+    "whitebeans",
+    "garlic"
+   ]
+  },
+  {
+   "id": "beanquesa",
+   "name": "Cheesy bean quesadillas",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "tortillas",
+    "cheese",
+    "blackbeans",
+    "salsa"
+   ]
+  },
+  {
+   "id": "lentilrice",
+   "name": "Lentil and rice bowl",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "lentils",
+    "rice",
+    "onions",
+    "fmix",
+    "garlic"
+   ]
+  },
+  {
+   "id": "omelet",
+   "name": "Veggie omelet and toast",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "eggs",
+    "cheese",
+    "bread",
+    "fmix",
+    "onions"
+   ]
+  },
+  {
+   "id": "chickpeastew",
+   "name": "Chickpea tomato stew over rice",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "chickpeas",
+    "dtomatoes",
+    "rice",
+    "onions",
+    "garlic"
+   ]
+  },
+  {
+   "id": "garlicpasta",
+   "name": "Garlic pasta with spinach",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "pasta",
+    "garlic",
+    "spinach"
+   ]
+  },
+  {
+   "id": "threebean",
+   "name": "Three bean chili",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "blackbeans",
+    "whitebeans",
+    "pinto",
+    "dtomatoes",
+    "onions",
+    "peppers"
+   ]
+  },
+  {
+   "id": "ricecabbage",
+   "name": "Rice and beans with cabbage",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "rice",
+    "blackbeans",
+    "cabbage",
+    "onions"
+   ]
+  },
+  {
+   "id": "spicedlentils",
+   "name": "Spiced lentils over rice",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "lentils",
+    "rice",
+    "onions",
+    "dtomatoes",
+    "garlic"
+   ]
+  },
+  {
+   "id": "vegstirfry",
+   "name": "Veggie stir-fry over rice",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "rice",
+    "broccoli",
+    "carrots",
+    "onions",
+    "soy"
+   ]
+  },
+  {
+   "id": "hash",
+   "name": "Potato and egg hash",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "potatoes",
+    "eggs",
+    "onions",
+    "peppers"
+   ]
+  },
+  {
+   "id": "spinachquesa",
+   "name": "Spinach and cheese quesadillas",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "tortillas",
+    "cheese",
+    "spinach"
+   ]
+  },
+  {
+   "id": "refriedburrito",
+   "name": "Refried bean burritos with rice",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "refried",
+    "tortillas",
+    "cheese",
+    "rice"
+   ]
+  },
+  {
+   "id": "tortillapizza",
+   "name": "Tortilla pizzas",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "tortillas",
+    "marinara",
+    "cheese",
+    "peppers"
+   ]
+  },
+  {
+   "id": "noodlecabbage",
+   "name": "Egg noodle cabbage stir-fry",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "pasta",
+    "cabbage",
+    "carrots",
+    "soy",
+    "eggs"
+   ]
+  },
+  {
+   "id": "mushroompasta",
+   "name": "Mushroom and spinach pasta",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "pasta",
+    "mushrooms",
+    "garlic",
+    "spinach"
+   ]
+  },
+  {
+   "id": "potatosoup",
+   "name": "Potato and carrot soup",
+   "type": "dinner",
+   "meat": null,
+   "items": [
+    "potatoes",
+    "carrots",
+    "onions",
+    "broth",
+    "milk"
+   ]
+  },
+  {
+   "id": "bakedfish",
+   "name": "Baked fish with rice and veggies",
+   "type": "dinner",
+   "meat": "fish",
+   "items": [
+    "fish",
+    "rice",
+    "fmix",
+    "garlic"
+   ]
+  },
+  {
+   "id": "tunapasta",
+   "name": "Tuna pasta",
+   "type": "dinner",
+   "meat": "fish",
+   "items": [
+    "tuna",
+    "pasta",
+    "fmix",
+    "cheese"
+   ]
+  },
+  {
+   "id": "fishtacos",
+   "name": "Fish tacos with cabbage",
+   "type": "dinner",
+   "meat": "fish",
+   "items": [
+    "fish",
+    "tortillas",
+    "cabbage",
+    "salsa"
+   ]
+  },
+  {
+   "id": "salmonpatties",
+   "name": "Salmon patties",
+   "type": "dinner",
+   "meat": "fish",
+   "items": [
+    "salmon",
+    "eggs",
+    "bread",
+    "onions"
+   ]
+  },
+  {
+   "id": "chickenstir",
+   "name": "Chicken stir-fry",
+   "type": "dinner",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "rice",
+    "fmix",
+    "onions",
+    "garlic",
+    "soy"
+   ]
+  },
+  {
+   "id": "chickensoup",
+   "name": "Chicken and rice soup",
+   "type": "dinner",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "rice",
+    "carrots",
+    "onions",
+    "broth"
+   ]
+  },
+  {
+   "id": "chickenpan",
+   "name": "Sheet pan chicken and potatoes",
+   "type": "dinner",
+   "meat": "chicken",
+   "items": [
+    "chicken",
+    "potatoes",
+    "carrots",
+    "onions"
+   ]
+  },
+  {
+   "id": "chili",
+   "name": "Beef and bean chili",
+   "type": "dinner",
+   "meat": "beef",
+   "items": [
+    "beef",
+    "blackbeans",
+    "dtomatoes",
+    "onions",
+    "garlic"
+   ]
+  },
+  {
+   "id": "beefbowl",
+   "name": "Beef and rice taco bowls",
+   "type": "dinner",
+   "meat": "beef",
+   "items": [
+    "beef",
+    "rice",
+    "blackbeans",
+    "salsa",
+    "cheese"
+   ]
+  },
+  {
+   "id": "beefpotato",
+   "name": "Beef and potato skillet",
+   "type": "dinner",
+   "meat": "beef",
+   "items": [
+    "beef",
+    "potatoes",
+    "onions"
+   ]
+  },
+  {
+   "id": "baconpasta",
+   "name": "Bacon and veggie pasta",
+   "type": "dinner",
+   "meat": "bacon",
+   "items": [
+    "bacon",
+    "pasta",
+    "fmix",
+    "garlic"
+   ]
+  }
+ ],
+ "ads": {
+  "updated": null,
+  "items": []
+ }
+}
