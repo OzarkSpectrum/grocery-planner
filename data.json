@@ -1,5 +1,5 @@
 {
- "version": 6,
+ "version": 7,
  "updated": "2026-11-15",
  "items": [
   {
@@ -554,6 +554,41 @@
    "unit": "jar",
    "cat": "Spices",
    "est": 3.0
+  },
+  {
+   "id": "ricotta",
+   "name": "Ricotta cheese",
+   "unit": "20 oz",
+   "cat": "Dairy & eggs",
+   "est": 3.5
+  },
+  {
+   "id": "parmesan",
+   "name": "Parmesan cheese",
+   "unit": "small",
+   "cat": "Dairy & eggs",
+   "est": 4.0
+  },
+  {
+   "id": "mozzarella",
+   "name": "Mozzarella cheese",
+   "unit": "bag",
+   "cat": "Dairy & eggs",
+   "est": 3.0
+  },
+  {
+   "id": "parsley",
+   "name": "Fresh Italian parsley",
+   "unit": "bunch",
+   "cat": "Produce",
+   "est": 1.5
+  },
+  {
+   "id": "manicotti",
+   "name": "Manicotti noodles",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 2.5
   }
  ],
  "recipes": [

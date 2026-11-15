@@ -1,5 +1,5 @@
 {
- "version": 9,
+ "version": 10,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -185,6 +185,48 @@
     "cheese"
    ],
    "submittedAt": "11/15/2026 17:36:27"
+  },
+  {
+   "id": "manicotti",
+   "title": "Manicotti",
+   "from": "Rebecca",
+   "sharedBy": "Crackle Dackle",
+   "type": "dinner",
+   "note": "The recipe says to put pasta sauce (meat sauce) on top of the manicotti. Use meat sauce or plain pasta sauce, as you like.",
+   "ingredients": [
+    "1 container (20 ounce) ricotta",
+    "3 ounces Parmesan cheese, shredded",
+    "3 ounces mozzarella, shredded",
+    "2 cloves garlic, minced",
+    "2 ounces fresh Italian parsley",
+    "Half a tablespoon pepper (crushed red pepper if desired)",
+    "Half a teaspoon salt",
+    "Manicotti noodles",
+    "Pasta sauce (for the dish and the top)",
+    "Another 3 ounces mozzarella cheese (for the top)",
+    "Another 3 ounces Parmesan (for the top)"
+   ],
+   "steps": [
+    "Mix together the ricotta, Parmesan, mozzarella, garlic, parsley, pepper and salt.",
+    "Boil the manicotti noodles for only seven minutes (or al dente).",
+    "Stuff the cheese mixture inside the noodles.",
+    "Put pasta sauce in a 9 x 13 baking dish, then place the filled manicotti in the dish.",
+    "Put pasta sauce (meat sauce) on top of the manicotti.",
+    "Put another 3 ounces of mozzarella on top, and another 3 ounces of Parmesan on top.",
+    "Cover with foil and bake at 375 for 20 minutes."
+   ],
+   "items": [
+    "ricotta",
+    "parmesan",
+    "mozzarella",
+    "garlic",
+    "parsley",
+    "pepper",
+    "salt",
+    "manicotti",
+    "marinara"
+   ],
+   "submittedAt": "11/15/2026 17:49:15"
   }
  ]
 }
