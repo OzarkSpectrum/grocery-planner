@@ -489,7 +489,8 @@ function viewFamily(){
   const froms = [...new Set(FAMILY.recipes.map(r => r.from).filter(Boolean))].sort();
   const list = FAMILY.recipes.filter(r => !ui.famFilter || r.from === ui.famFilter);
   let h = `<section class="card"><h2>Family recipes</h2>
-    <div class="small muted" style="margin-top:6px">Tap a recipe to open it. These save to your phone, so they work offline after one visit with a connection. To add one, send it to Jessica.</div>
+    <div class="small muted" style="margin-top:6px">Tap a recipe to open it. These save to your phone, so they work offline after one visit with a connection. Have a recipe to share? Tap Submit a recipe (needs a connection). New ones appear here within a day.</div>
+    <div class="btns"><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScpCtiZRc0MX0koVTlQRJyQzh5oixrpniJCH7bJeP-OufHbkg/viewform" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block;text-align:center">Submit a recipe</a></div>
     ${froms.length > 1 ? `<div class="row" style="gap:8px;margin-top:10px"><label class="small muted" for="famf" style="flex:1">Show recipes from</label><select id="famf" data-act="famfilter" style="width:auto"><option value="">Everyone</option>${froms.map(f => `<option value="${esc(f)}"${ui.famFilter === f ? " selected" : ""}>${esc(f)}</option>`).join("")}</select></div>` : ""}</section>`;
   if (!FAMILY.recipes.length) return h + `<div class="empty">No family recipes yet. Once Jessica adds some, they will show up here the next time you open the app with a connection.</div>`;
   return h + `<section class="card" style="padding:4px 14px">${list.map(famRecipe).join("")}</section>`;
