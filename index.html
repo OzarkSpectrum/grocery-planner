@@ -456,6 +456,7 @@ function mealForm(){
     ${ed && ed.edited ? `<button class="btn ghost" data-act="resetmeal">Reset to original</button>` : ""}</div></section>`;
 }
 const LS_FAM = "grocery-planner-family";
+const FAM_BASE = "";
 let FAMILY = {updated:null, recipes:[]};
 function validFam(d){
   return !!d && Array.isArray(d.recipes) && d.recipes.every(r => r && r.id && r.title && Array.isArray(r.ingredients) && Array.isArray(r.steps));
@@ -467,7 +468,8 @@ function famRecipe(r){
     <div class="tiny muted">${r.from ? "From " + esc(r.from) : ""}${r.from && r.sharedBy ? " · " : ""}${r.sharedBy ? "Shared by " + esc(r.sharedBy) : ""}${r.servings ? " · " + esc(r.servings) : ""}</div></summary>
     ${r.note ? `<div class="small muted" style="margin-top:6px">${esc(r.note)}</div>` : ""}
     <div class="small muted" style="margin-top:8px">Ingredients</div><ul>${r.ingredients.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    <div class="small muted">Directions</div><ol>${r.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol></details>`;
+    <div class="small muted">Directions</div><ol>${r.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+    ${(r.images || []).length ? `<div class="small muted" style="margin-top:8px">The original card</div>` + r.images.map(u => `<img src="${esc(FAM_BASE + u)}" alt="Handwritten recipe card for ${esc(r.title)}" style="width:100%;border-radius:10px;margin-top:8px">`).join("") : ""}</details>`;
 }
 function viewFamily(){
   const froms = [...new Set(FAMILY.recipes.map(r => r.from).filter(Boolean))].sort();
@@ -486,6 +488,7 @@ async function fetchFamily(){
     if (!validFam(d)) throw new Error("bad family data");
     FAMILY = d;
     try { localStorage.setItem(LS_FAM, JSON.stringify(d)); } catch (e) {}
+    d.recipes.forEach(r => (r.images || []).forEach(u => { fetch(FAM_BASE + u).catch(() => {}); })); // keep card photos for offline
     const a = document.activeElement;
     if (!(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) render();
   } catch (e) {}
