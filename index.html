@@ -177,7 +177,7 @@ function defaults(){
   return {v:2, updatedAt:0, budget:40, pref:"harter", stores:DEFAULT_STORES.slice(), threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
-    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[], famSeen:[], famList:[]};
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[], famSeen:[], famList:[], famPlan:new Array(5).fill(null)};
 }
 let state = defaults();
 function normalize(s){
@@ -187,6 +187,7 @@ function normalize(s){
   ["extras","custom","last","hidden","myItems","famSeen","famList"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
   const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id) || famPool().some(r => r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
+  o.famPlan = (Array.isArray(o.famPlan) && o.famPlan.length === 5) ? o.famPlan.map(x => typeof x === "string" ? x : null) : new Array(5).fill(null);
   o.myItems = o.myItems.filter(i => i && i.id && i.name && CATS.includes(i.cat) && typeof i.est === "number");
   syncStores(o);
   if (typeof o.budget !== "number" || !(o.budget >= 0)) o.budget = 40;
@@ -241,7 +242,7 @@ function bestStore(id){
 }
 const itemCost = id => priceFor(id, bestStore(id)).price;
 
-function famListRecipes(){ const l = state.famList || []; return (FAMILY.recipes || []).filter(r => l.includes(r.id)); }
+function famListRecipes(){ const l = (state.famList || []).concat((state.famPlan || []).filter(Boolean)); const seen = new Set(); return (FAMILY.recipes || []).filter(r => l.includes(r.id) && !seen.has(r.id) && seen.add(r.id)); }
 function planIds(){
   const s = new Set();
   state.plan.forEach(rid => { const r = rid && recipeById(rid); if (r) rItems(r).forEach(i => s.add(i)); });
@@ -342,6 +343,12 @@ function tagFor(kind){
   if (kind === "est") return '<span class="tag">est.</span>';
   return "";
 }
+function famSelect(d){
+  if (!(FAMILY.recipes || []).length) return "";
+  const cur = (state.famPlan || [])[d];
+  return `<label>Family recipe (optional)</label><select data-act="famslot" data-i="${d}" aria-label="${DAYS[d]} family recipe"><option value="">None</option>` +
+    FAMILY.recipes.map(r => `<option value="${esc(r.id)}"${r.id === cur ? " selected" : ""}>${esc(r.title)}${r.from ? " (" + esc(r.from) + ")" : ""}</option>`).join("") + `</select>`;
+}
 function slotSelect(i){
   const t = i % 2 === 0 ? "lunch" : "dinner"; const d = Math.floor(i / 2); const cur = state.plan[i];
   const opts = allRecipes().filter(r => fits(r, t) && (r.minDay || 0) <= d && (!r.meat || state.meats[r.meat] || r.id === cur));
@@ -373,7 +380,7 @@ function viewPlan(){
   </section>`;
   for (let d = 0; d < 5; d++) {
     h += `<section class="card day"><div class="dn">${DAYS[d]}</div>
-      <label>Lunch</label>${slotSelect(d * 2)}<label>Dinner</label>${slotSelect(d * 2 + 1)}</section>`;
+      <label>Lunch</label>${slotSelect(d * 2)}<label>Dinner</label>${slotSelect(d * 2 + 1)}${famSelect(d)}</section>`;
   }
   return h;
 }
@@ -406,7 +413,7 @@ function viewShop(){
       <div style="text-align:right"><div class="tiny muted">Spent so far</div><div class="big">${t.anyActual ? money(t.spent) : "$0.00"}</div></div></div>
       <div class="small muted" style="margin-top:8px">Type the price from the shelf or receipt. It also goes into your price book.</div></section>`;
   const fl = famListRecipes();
-  if (fl.length) h += `<section class="card"><div class="small muted">Includes ingredients for family recipes: ${fl.map(r => esc(r.title)).join(", ")}. Remove them under Meals, Family recipes.</div></section>`;
+  if (fl.length) h += `<section class="card"><div class="small muted">Includes ingredients for family recipes: ${fl.map(r => esc(r.title)).join(", ")}. Change them on the Plan tab or under Meals, Family recipes.</div></section>`;
   if (!entries.length) h += `<p class="empty">Nothing to buy yet. Plan some meals first, or add an extra item below.</p>`;
   order.forEach(s => {
     const list = entries.filter(e => e.store === s);
@@ -651,14 +658,14 @@ document.addEventListener("click", ev => {
   }
   if (a === "fill") { ui.planMsg = ""; fillPlan(true, false); save(); render(); return; }
   if (a === "shuffle") { ui.planMsg = ""; state.plan = new Array(10).fill(null); fillPlan(true, true); save(); render(); return; }
-  if (a === "clear") { ui.planMsg = ""; state.plan = new Array(10).fill(null); state.checked = {}; save(); render(); return; }
+  if (a === "clear") { ui.planMsg = ""; state.famPlan = new Array(5).fill(null); state.plan = new Array(10).fill(null); state.checked = {}; save(); render(); return; }
   if (a === "copy") { copyList(); return; }
   if (a === "checkdata") { ui.dataMsg = "Checking..."; render(); fetchData(true); return; }
   if (a === "newweek") {
     if (!ui.confirmNew) { ui.confirmNew = true; render(); return; }
     ui.confirmNew = false;
     state.last = [...new Set(state.plan.filter(Boolean))];
-    state.plan = new Array(10).fill(null); state.checked = {}; state.actual = {}; state.extras = []; state.famList = [];
+    state.plan = new Array(10).fill(null); state.checked = {}; state.actual = {}; state.extras = []; state.famList = []; state.famPlan = new Array(5).fill(null);
     state.meats = {fish:false,chicken:false,beef:false,bacon:false};
     fillPlan(true, false); save(); render(); window.scrollTo(0, 0); return;
   }
@@ -702,7 +709,8 @@ document.addEventListener("change", ev => {
   const el = ev.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; if (CLICK_ACTS.has(a)) return;
   const id = el.dataset.id;
-  if (a === "slot") { state.plan[+el.dataset.i] = el.value || null; }
+  if (a === "famslot") { state.famPlan[+el.dataset.i] = el.value || null; }
+  else if (a === "slot") { state.plan[+el.dataset.i] = el.value || null; }
   else if (a === "pantry") { if (el.checked) state.pantry[id] = true; else delete state.pantry[id]; }
   else if (a === "check") { if (el.checked) state.checked[id] = true; else delete state.checked[id]; }
   else if (a === "budget") { const n = parseMoney(el.value); if (n !== null) state.budget = n; }
