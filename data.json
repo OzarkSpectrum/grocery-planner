@@ -1,5 +1,5 @@
 {
- "version": 2,
+ "version": 3,
  "updated": "2026-11-15",
  "items": [
   {
@@ -337,6 +337,55 @@
    "unit": "each",
    "cat": "Frozen",
    "est": 3.0
+  },
+  {
+   "id": "butter",
+   "name": "Butter",
+   "unit": "lb",
+   "cat": "Dairy & eggs",
+   "est": 4.5
+  },
+  {
+   "id": "flour",
+   "name": "Flour",
+   "unit": "5 lb",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "bakingpowder",
+   "name": "Baking powder",
+   "unit": "can",
+   "cat": "Pantry",
+   "est": 2.5
+  },
+  {
+   "id": "chocolate",
+   "name": "Chocolate or cocoa",
+   "unit": "each",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "raisins",
+   "name": "Raisins",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "mincemeat",
+   "name": "Mincemeat",
+   "unit": "jar",
+   "cat": "Canned & jarred",
+   "est": 4.0
+  },
+  {
+   "id": "nuts",
+   "name": "Chopped nuts",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 5.0
   }
  ],
  "recipes": [

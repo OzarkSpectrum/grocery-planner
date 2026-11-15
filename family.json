@@ -1,5 +1,5 @@
 {
- "version": 4,
+ "version": 5,
  "updated": "2026-11-15",
  "recipes": [
   {
@@ -38,6 +38,48 @@
     "pecans",
     "margarine",
     "piecrust"
+   ]
+  },
+  {
+   "id": "herod-potato-cake",
+   "title": "Potato Cake",
+   "from": "Grandma Herod",
+   "sharedBy": "Jessica",
+   "type": "dessert",
+   "note": "From a handwritten recipe card. The card lists ingredients and an oven temperature only, with no mixing directions or baking time, and the sugar amount is hard to read.",
+   "ingredients": [
+    "1 cup potatoes, boiled and mashed",
+    "Sugar (amount hard to read on the card, looks like 2 cups)",
+    "1 cup butter",
+    "2 cups flour",
+    "1/2 cup sweet milk",
+    "4 eggs",
+    "4 tablespoons chocolate",
+    "2 teaspoons baking powder",
+    "1/2 teaspoon each cloves, cinnamon and nutmeg",
+    "1 lb. raisins and mincemeat",
+    "1 cup chopped nuts",
+    "Salt",
+    "Flavoring"
+   ],
+   "steps": [
+    "Bake at 350 degrees. (The card doesn't give a time.)"
+   ],
+   "items": [
+    "potatoes",
+    "sugar",
+    "butter",
+    "flour",
+    "milk",
+    "eggs",
+    "chocolate",
+    "bakingpowder",
+    "raisins",
+    "mincemeat",
+    "nuts"
+   ],
+   "images": [
+    "family/herod-potato-cake-1.jpg"
    ]
   }
  ]
