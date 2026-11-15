@@ -1,13 +1,13 @@
 {
- "version": 6,
+ "version": 7,
  "updated": "2026-11-15",
  "recipes": [
   {
    "id": "herod-pecan-pie",
    "title": "Pecan Pie",
-   "from": "Grandma Pauline Herod",
+   "from": "Grandma Maude Pauline Herod (DAR)",
    "sharedBy": "Jessica",
-   "note": "From Grandma Pauline Herod's handwritten recipe card.",
+   "note": "From Grandma Maude Pauline Herod (DAR)'s handwritten recipe card.",
    "ingredients": [
     "1 cup Karo all-purpose syrup",
     "3 eggs, slightly beaten",
@@ -43,7 +43,7 @@
   {
    "id": "herod-potato-cake",
    "title": "Potato Cake",
-   "from": "Grandma Herod",
+   "from": "Grandma Maude Pauline Herod (DAR)",
    "sharedBy": "Jessica",
    "type": "dessert",
    "note": "From a handwritten recipe card. The card lists ingredients and an oven temperature only, with no mixing directions or baking time, and the sugar amount is hard to read.",
@@ -85,11 +85,11 @@
   {
    "id": "herod-devil-food-cake",
    "title": "Devil Food Cake",
-   "from": "Grandma Herod",
+   "from": "Grandma Maude Pauline Herod (DAR)",
    "sharedBy": "Jessica",
    "type": "dessert",
    "servings": "Five layers",
-   "note": "From Grandma Pauline Herod's handwritten recipes. The photo cuts off right at \"Bake\", so the oven temperature and time are still to be added.",
+   "note": "From Grandma Maude Pauline Herod (DAR)'s handwritten recipes. The photo cuts off right at \"Bake\", so the oven temperature and time are still to be added.",
    "ingredients": [
     "2 cups white sugar",
     "1 cup Crisco",
