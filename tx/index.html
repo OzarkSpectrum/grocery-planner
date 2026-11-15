@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grocery Planner</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Groceries">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1d6a4d">
+<style>
+/* Pine green on cool paper, burnt orange only for sale tags. One column, thumb-reach tabs at the bottom. System fonts so it works offline. */
+:root{
+  --paper:#f4f6f1; --card:#ffffff; --ink:#17211c; --muted:#5b6a61; --line:#d8dfd7;
+  --accent:#1d6a4d; --accent-ink:#ffffff; --tint:#e4efe8; --sale:#b5400f; --warn:#a35a00; --bad:#b3261e;
+  --display:"Avenir Next","Trebuchet MS",system-ui,-apple-system,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#111815; --card:#19221d; --ink:#e6eee8; --muted:#9aab9f; --line:#2b3830;
+    --accent:#5cbf96; --accent-ink:#0a1510; --tint:#1f3128; --sale:#ff9b5e; --warn:#f0b35a; --bad:#ff8a80;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.45 var(--body);-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom)) 0}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:18px 0 10px}
+h1{font:700 26px/1.1 var(--display);margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.sync{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap;background:var(--card)}
+.sync.ok{color:var(--accent);border-color:var(--accent)}
+h2{font:700 18px/1.2 var(--display);margin:0 0 8px}
+h3{font:700 13px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.tiny{font-size:12px}
+.big{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:999px;background:var(--tint);overflow:hidden;margin:10px 0 6px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar.over>i{background:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+button,select,input,textarea{font:inherit;color:inherit}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:9px 16px;min-height:44px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn{border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:10px 16px;min-height:44px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.warn{border-color:var(--bad);color:var(--bad);background:transparent}
+.btn.mini{min-height:32px;padding:2px 12px;font-size:13px;border-radius:9px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+select,input[type=text],input[type=number]{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px;font-size:16px;max-width:100%}
+select{width:100%}
+.day{padding:12px 14px}
+.day .dn{font:700 15px var(--display);margin-bottom:6px}
+.day label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px;letter-spacing:.04em;text-transform:uppercase}
+.item{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);flex:none}
+.item .nm{flex:1;min-width:0}
+.item .n{font-weight:500}
+.item.done .n{text-decoration:line-through;color:var(--muted)}
+.meta{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap}
+.meta select{width:auto;min-height:32px;padding:2px 6px;font-size:13px;border-radius:8px}
+.amt{width:84px;text-align:right}
+.tag{font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;border:1px solid var(--line);color:var(--muted)}
+.tag.sale{color:var(--sale);border-color:var(--sale)}
+.tag.you{color:var(--accent);border-color:var(--accent)}
+.grp{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 6px}
+.grp b{font:700 17px var(--display)}
+.pb{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.pb th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:left;padding:4px 4px}
+.pb td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}
+.pb input{width:100%;min-width:0;padding:6px 6px;min-height:40px;text-align:right}
+.pb .pn{font-weight:500;line-height:1.25}
+.pb select{min-height:30px;font-size:12px;padding:1px 4px;margin-top:3px;width:auto}
+textarea{width:100%;min-height:150px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px;font:14px/1.4 var(--body)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav button{border:0;background:transparent;border-radius:10px;min-height:48px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer}
+nav button[aria-current="page"]{background:var(--tint);color:var(--accent);font-weight:700}
+.empty{color:var(--muted);padding:6px 0}
+.sale-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.sale-line b{color:var(--sale);font-variant-numeric:tabular-nums}
+.ings{max-height:280px;overflow:auto;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;margin:6px 0}
+.ings .item{padding:6px 0}
+.mrow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:0}
+.err{color:var(--bad);font-size:14px;margin-top:6px}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .25s ease}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Grocery Planner</h1>
+      <div class="sub">Mon to Fri lunches and dinners, one person</div>
+    </div>
+    <span id="sync" class="sync" role="status">Online</span>
+  </header>
+  <main id="view"></main>
+</div>
+<nav aria-label="Sections"><div class="in" id="nav"></div></nav>
+
+<script>
+/* ---------- core: data and logic, no DOM ---------- */
+const STORES = {harter:"Harter House", cmart:"Country Mart", aldi:"Aldi", heb:"H-E-B", albertsons:"Albertsons"};
+const STORE_SHORT = {harter:"Harter", cmart:"C. Mart", aldi:"Aldi", heb:"HEB", albertsons:"Albert."};
+const DEFAULT_STORES = ["heb","albertsons","aldi"];
+let STORE_KEYS = DEFAULT_STORES.slice();
+function syncStores(o){
+  const a = Object.keys(STORES).filter(k => Array.isArray(o.stores) && o.stores.includes(k));
+  o.stores = a.length ? a : DEFAULT_STORES.slice();
+  STORE_KEYS = o.stores.slice();
+  if (!STORE_KEYS.includes(o.pref)) o.pref = STORE_KEYS[0];
+}
+const MEATS = ["fish","chicken","beef","bacon"];
+const MEAT_LABEL = {fish:"Fish", chicken:"Chicken", beef:"Beef", bacon:"Bacon"};
+const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
+const CATS = ["Produce","Dairy & eggs","Bakery","Pantry","Canned & jarred","Frozen","Meat & fish"];
+
+/* Replaced at build time. data.json on the web holds newer copies of the same thing. */
+const EMBED = {"version":1,"updated":"2026-11-15","items":[{"id":"onions","name":"Onions","unit":"bag","cat":"Produce","est":1.5},{"id":"garlic","name":"Garlic","unit":"head","cat":"Produce","est":0.7},{"id":"sweetp","name":"Sweet potatoes","unit":"2 or 3","cat":"Produce","est":2.0},{"id":"potatoes","name":"Potatoes","unit":"5 lb bag","cat":"Produce","est":3.5},{"id":"carrots","name":"Carrots","unit":"2 lb bag","cat":"Produce","est":1.6},{"id":"cabbage","name":"Cabbage","unit":"head","cat":"Produce","est":2.0},{"id":"peppers","name":"Bell peppers","unit":"2","cat":"Produce","est":2.0},{"id":"spinach","name":"Spinach","unit":"5 oz","cat":"Produce","est":2.0},{"id":"mushrooms","name":"Mushrooms","unit":"8 oz","cat":"Produce","est":2.0},{"id":"eggs","name":"Eggs","unit":"dozen","cat":"Dairy & eggs","est":3.0},{"id":"cheese","name":"Shredded cheese","unit":"8 oz","cat":"Dairy & eggs","est":2.5},{"id":"milk","name":"Milk","unit":"half gallon","cat":"Dairy & eggs","est":2.5},{"id":"bread","name":"Bread","unit":"loaf","cat":"Bakery","est":1.5},{"id":"tortillas","name":"Flour tortillas","unit":"8 count","cat":"Bakery","est":2.0},{"id":"rice","name":"Rice","unit":"2 lb","cat":"Pantry","est":2.0},{"id":"pasta","name":"Pasta","unit":"1 lb","cat":"Pantry","est":1.3},{"id":"lentils","name":"Dried lentils","unit":"1 lb","cat":"Pantry","est":1.8},{"id":"broth","name":"Veggie broth","unit":"carton","cat":"Pantry","est":2.0},{"id":"soy","name":"Soy sauce","unit":"bottle","cat":"Pantry","est":2.5},{"id":"mayo","name":"Mayo","unit":"jar","cat":"Pantry","est":3.0},{"id":"pb","name":"Peanut butter","unit":"jar","cat":"Pantry","est":2.5},{"id":"jelly","name":"Jelly","unit":"jar","cat":"Pantry","est":2.0},{"id":"macbox","name":"Mac and cheese box","unit":"box","cat":"Pantry","est":1.0},{"id":"ramen","name":"Ramen noodles","unit":"3 packs","cat":"Pantry","est":1.0},{"id":"cornbread","name":"Cornbread mix","unit":"box","cat":"Pantry","est":1.0},{"id":"blackbeans","name":"Black beans","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"whitebeans","name":"White beans","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"chickpeas","name":"Chickpeas","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"pinto","name":"Pinto beans","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"refried","name":"Refried beans","unit":"can","cat":"Canned & jarred","est":1.2},{"id":"dtomatoes","name":"Diced tomatoes","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"tomsoup","name":"Tomato soup","unit":"can","cat":"Canned & jarred","est":1.0},{"id":"marinara","name":"Marinara sauce","unit":"jar","cat":"Canned & jarred","est":1.8},{"id":"salsa","name":"Salsa","unit":"jar","cat":"Canned & jarred","est":1.8},{"id":"fmix","name":"Frozen mixed veggies","unit":"bag","cat":"Frozen","est":1.5},{"id":"broccoli","name":"Frozen broccoli","unit":"bag","cat":"Frozen","est":1.5},{"id":"fish","name":"Frozen white fish","unit":"bag","cat":"Meat & fish","est":5.5},{"id":"tuna","name":"Canned tuna","unit":"can","cat":"Meat & fish","est":1.25},{"id":"salmon","name":"Canned salmon","unit":"can","cat":"Meat & fish","est":3.0},{"id":"chicken","name":"Chicken breast","unit":"1 lb","cat":"Meat & fish","est":4.0},{"id":"beef","name":"Ground beef","unit":"1 lb","cat":"Meat & fish","est":6.0},{"id":"bacon","name":"Bacon","unit":"12 oz","cat":"Meat & fish","est":5.5}],"recipes":[{"id":"eggsalad","name":"Egg salad sandwich","type":"lunch","meat":null,"items":["eggs","bread","mayo"]},{"id":"chickpeasw","name":"Chickpea salad sandwich","type":"lunch","meat":null,"items":["chickpeas","bread","mayo","onions"]},{"id":"pbj","name":"Peanut butter and jelly sandwich","type":"lunch","meat":null,"items":["pb","jelly","bread"]},{"id":"pastasalad","name":"Cold pasta salad with cheese","type":"lunch","meat":null,"items":["pasta","peppers","cheese"]},{"id":"leftovers","name":"Leftovers from last night","type":"lunch","meat":null,"items":[],"minDay":1},{"id":"tunasw","name":"Tuna sandwich","type":"lunch","meat":"fish","items":["tuna","bread","mayo"]},{"id":"tunamelt","name":"Tuna melt","type":"lunch","meat":"fish","items":["tuna","bread","cheese"]},{"id":"chickenwrap","name":"Chicken wrap","type":"lunch","meat":"chicken","items":["chicken","tortillas","salsa","cheese"]},{"id":"chickensalad","name":"Chicken salad sandwich","type":"lunch","meat":"chicken","items":["chicken","bread","mayo"]},{"id":"baconegg","name":"Bacon and egg sandwich","type":"lunch","meat":"bacon","items":["bacon","eggs","bread"]},{"id":"lentilsoup","name":"Lentil soup","type":"any","meat":null,"items":["lentils","onions","garlic","broth","carrots"]},{"id":"grilledcheese","name":"Grilled cheese and tomato soup","type":"any","meat":null,"items":["bread","cheese","tomsoup"]},{"id":"beanburrito","name":"Bean and cheese burrito","type":"any","meat":null,"items":["blackbeans","tortillas","cheese","salsa"]},{"id":"veggiequesa","name":"Veggie quesadilla","type":"any","meat":null,"items":["tortillas","cheese","peppers","onions"]},{"id":"blacksoup","name":"Black bean soup","type":"any","meat":null,"items":["blackbeans","onions","garlic","broth","salsa"]},{"id":"bakedpotato","name":"Loaded baked potato with broccoli","type":"any","meat":null,"items":["potatoes","cheese","broccoli"]},{"id":"macveg","name":"Mac and cheese with veggies","type":"any","meat":null,"items":["macbox","milk","fmix"]},{"id":"beanrice","name":"Bean and rice bowl","type":"any","meat":null,"items":["blackbeans","rice","salsa","cheese"]},{"id":"eggburrito","name":"Egg and cheese burrito","type":"any","meat":null,"items":["eggs","tortillas","cheese","salsa"]},{"id":"pintocorn","name":"Pinto beans and cornbread","type":"any","meat":null,"items":["pinto","cornbread","onions"]},{"id":"ramenegg","name":"Ramen with egg and veggies","type":"any","meat":null,"items":["ramen","eggs","fmix"]},{"id":"tomatorice","name":"Tomato rice soup","type":"any","meat":null,"items":["dtomatoes","rice","broth","onions"]},{"id":"chickenquesa","name":"Chicken quesadilla","type":"any","meat":"chicken","items":["chicken","tortillas","cheese","salsa"]},{"id":"baconpotato","name":"Baked potato with bacon and cheese","type":"any","meat":"bacon","items":["potatoes","bacon","cheese"]},{"id":"tacos","name":"Black bean and sweet potato tacos","type":"dinner","meat":null,"items":["blackbeans","sweetp","tortillas","cheese","onions","salsa"]},{"id":"friedrice","name":"Veggie egg fried rice","type":"dinner","meat":null,"items":["rice","eggs","fmix","onions","soy"]},{"id":"pastabeans","name":"Pasta with marinara and white beans","type":"dinner","meat":null,"items":["pasta","marinara","whitebeans","garlic"]},{"id":"beanquesa","name":"Cheesy bean quesadillas","type":"dinner","meat":null,"items":["tortillas","cheese","blackbeans","salsa"]},{"id":"lentilrice","name":"Lentil and rice bowl","type":"dinner","meat":null,"items":["lentils","rice","onions","fmix","garlic"]},{"id":"omelet","name":"Veggie omelet and toast","type":"dinner","meat":null,"items":["eggs","cheese","bread","fmix","onions"]},{"id":"chickpeastew","name":"Chickpea tomato stew over rice","type":"dinner","meat":null,"items":["chickpeas","dtomatoes","rice","onions","garlic"]},{"id":"garlicpasta","name":"Garlic pasta with spinach","type":"dinner","meat":null,"items":["pasta","garlic","spinach"]},{"id":"threebean","name":"Three bean chili","type":"dinner","meat":null,"items":["blackbeans","whitebeans","pinto","dtomatoes","onions","peppers"]},{"id":"ricecabbage","name":"Rice and beans with cabbage","type":"dinner","meat":null,"items":["rice","blackbeans","cabbage","onions"]},{"id":"spicedlentils","name":"Spiced lentils over rice","type":"dinner","meat":null,"items":["lentils","rice","onions","dtomatoes","garlic"]},{"id":"vegstirfry","name":"Veggie stir-fry over rice","type":"dinner","meat":null,"items":["rice","broccoli","carrots","onions","soy"]},{"id":"hash","name":"Potato and egg hash","type":"dinner","meat":null,"items":["potatoes","eggs","onions","peppers"]},{"id":"spinachquesa","name":"Spinach and cheese quesadillas","type":"dinner","meat":null,"items":["tortillas","cheese","spinach"]},{"id":"refriedburrito","name":"Refried bean burritos with rice","type":"dinner","meat":null,"items":["refried","tortillas","cheese","rice"]},{"id":"tortillapizza","name":"Tortilla pizzas","type":"dinner","meat":null,"items":["tortillas","marinara","cheese","peppers"]},{"id":"noodlecabbage","name":"Egg noodle cabbage stir-fry","type":"dinner","meat":null,"items":["pasta","cabbage","carrots","soy","eggs"]},{"id":"mushroompasta","name":"Mushroom and spinach pasta","type":"dinner","meat":null,"items":["pasta","mushrooms","garlic","spinach"]},{"id":"potatosoup","name":"Potato and carrot soup","type":"dinner","meat":null,"items":["potatoes","carrots","onions","broth","milk"]},{"id":"bakedfish","name":"Baked fish with rice and veggies","type":"dinner","meat":"fish","items":["fish","rice","fmix","garlic"]},{"id":"tunapasta","name":"Tuna pasta","type":"dinner","meat":"fish","items":["tuna","pasta","fmix","cheese"]},{"id":"fishtacos","name":"Fish tacos with cabbage","type":"dinner","meat":"fish","items":["fish","tortillas","cabbage","salsa"]},{"id":"salmonpatties","name":"Salmon patties","type":"dinner","meat":"fish","items":["salmon","eggs","bread","onions"]},{"id":"chickenstir","name":"Chicken stir-fry","type":"dinner","meat":"chicken","items":["chicken","rice","fmix","onions","garlic","soy"]},{"id":"chickensoup","name":"Chicken and rice soup","type":"dinner","meat":"chicken","items":["chicken","rice","carrots","onions","broth"]},{"id":"chickenpan","name":"Sheet pan chicken and potatoes","type":"dinner","meat":"chicken","items":["chicken","potatoes","carrots","onions"]},{"id":"chili","name":"Beef and bean chili","type":"dinner","meat":"beef","items":["beef","blackbeans","dtomatoes","onions","garlic"]},{"id":"beefbowl","name":"Beef and rice taco bowls","type":"dinner","meat":"beef","items":["beef","rice","blackbeans","salsa","cheese"]},{"id":"beefpotato","name":"Beef and potato skillet","type":"dinner","meat":"beef","items":["beef","potatoes","onions"]},{"id":"baconpasta","name":"Bacon and veggie pasta","type":"dinner","meat":"bacon","items":["bacon","pasta","fmix","garlic"]}],"ads":{"updated":null,"items":[]}};
+
+let ITEMS = [], RECIPES = [], ITEM_BY = {}, RECIPE_BY = {};
+let curVersion = 0, dataUpdated = null;
+let ads = {updated:null, items:[]};
+
+function setData(d){
+  ITEMS = d.items.slice(); RECIPES = d.recipes.slice();
+  ITEM_BY = {}; ITEMS.forEach(i => ITEM_BY[i.id] = i);
+  RECIPE_BY = {}; RECIPES.forEach(r => RECIPE_BY[r.id] = r);
+}
+function validData(d){
+  return !!d && Array.isArray(d.items) && Array.isArray(d.recipes) && d.items.length > 0 && d.recipes.length > 0 &&
+    d.items.every(i => i && i.id && i.name && typeof i.est === "number") &&
+    d.recipes.every(r => r && r.id && r.name && Array.isArray(r.items));
+}
+function normalizeAds(a){
+  const out = {updated:(a && a.updated) || null, items:[]};
+  if (a && Array.isArray(a.items)) out.items = a.items.filter(x => x && STORES[x.store] && typeof x.price === "number");
+  return out;
+}
+function eff(r){ const e = state.edits && state.edits[r.id]; return e ? Object.assign({}, r, e, {edited:true}) : r; }
+function allRecipes(){ return RECIPES.map(eff).concat(state.custom || []); }
+function recipeById(id){ return RECIPE_BY[id] ? eff(RECIPE_BY[id]) : ((state.custom || []).find(r => r.id === id) || null); }
+function rItems(r){ return r.items.filter(id => ITEM_BY[id]); }
+const fits = (r, t) => r.type === t || r.type === "any";
+
+function defaults(){
+  return {v:2, updatedAt:0, budget:40, pref:"heb", stores:DEFAULT_STORES.slice(), threshold:0.5,
+    meats:{fish:false,chicken:false,beef:false,bacon:false},
+    pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}};
+}
+let state = defaults();
+function normalize(s){
+  const o = Object.assign(defaults(), s || {});
+  o.meats = Object.assign(defaults().meats, o.meats || {});
+  ["pantry","prices","overrides","checked","actual","edits"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
+  ["extras","custom","last"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
+  o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
+  syncStores(o);
+  if (typeof o.budget !== "number" || !(o.budget >= 0)) o.budget = 40;
+  if (typeof o.threshold !== "number" || !(o.threshold >= 0)) o.threshold = 0.5;
+  return o;
+}
+function applyData(d){
+  setData(d);
+  ads = normalizeAds(d.ads);
+  curVersion = d.version || 0;
+  dataUpdated = d.updated || null;
+  if (state && state.plan) state.plan = state.plan.map(x => (x && recipeById(x)) ? x : null);
+}
+
+const round2 = n => Math.round(n * 100) / 100;
+const money = n => "$" + (Number.isFinite(n) ? n : 0).toFixed(2);
+
+function adPrice(id, store){
+  let best = null;
+  for (const a of (ads.items || [])) {
+    if (a && a.itemId === id && a.store === store && typeof a.price === "number" && a.price >= 0) {
+      if (best === null || a.price < best) best = a.price;
+    }
+  }
+  return best;
+}
+function priceFor(id, store){
+  const it = ITEM_BY[id];
+  const sale = adPrice(id, store);
+  const lg = (state.prices[id] || {})[store];
+  const logged = (typeof lg === "number" && lg > 0) ? lg : null;
+  if (sale !== null && (logged === null || sale <= logged)) return {price:sale, kind:"sale"};
+  if (logged !== null) return {price:logged, kind:"logged"};
+  return {price:it.est, kind:"est"};
+}
+/* The preferred store wins unless another store is proven cheaper by more than the threshold
+   (a logged price, or a sale), and the preferred price is a real one or the other is a sale. */
+function bestStore(id){
+  const ov = state.overrides[id];
+  if (ov && STORE_KEYS.includes(ov)) return ov;
+  let best = state.pref;
+  const p = priceFor(id, best);
+  let bestP = p.price;
+  for (const s of STORE_KEYS) {
+    if (s === state.pref) continue;
+    const q = priceFor(id, s);
+    if (q.kind !== "est" && q.price + state.threshold < bestP && (p.kind !== "est" || q.kind === "sale")) {
+      best = s; bestP = q.price;
+    }
+  }
+  return best;
+}
+const itemCost = id => priceFor(id, bestStore(id)).price;
+
+function planIds(){
+  const s = new Set();
+  state.plan.forEach(rid => { const r = rid && recipeById(rid); if (r) rItems(r).forEach(i => s.add(i)); });
+  return s;
+}
+function neededIds(){ return [...planIds()].filter(i => !state.pantry[i]); }
+
+function listEntries(){
+  const out = neededIds().map(id => {
+    const it = ITEM_BY[id]; const store = bestStore(id); const p = priceFor(id, store);
+    return {id, name:it.name, unit:it.unit, cat:it.cat, store, price:p.price, kind:p.kind};
+  });
+  state.extras.forEach(x => out.push({id:x.id, name:x.name, unit:"", cat:"Extras", store:x.store, price:x.price, kind:"extra", extra:true}));
+  const ci = c => { const i = CATS.indexOf(c); return i < 0 ? 99 : i; };
+  out.sort((a, b) => (ci(a.cat) - ci(b.cat)) || a.name.localeCompare(b.name));
+  return out;
+}
+function totals(){
+  const e = listEntries();
+  const planned = round2(e.reduce((s, x) => s + x.price, 0));
+  let spent = 0, anyActual = false;
+  e.forEach(x => { const a = state.actual[x.id]; if (typeof a === "number") { spent += a; anyActual = true; } });
+  return {planned, spent:round2(spent), anyActual, count:e.length};
+}
+
+/* Fill the week. Each toggled meat gets one meal; everything else is vegetarian, chosen by lowest added cost,
+   with a penalty for repeats and for last week's meals, plus a little randomness so weeks differ. */
+function fillPlan(replaceForMeat, shuffle){
+  const rnd = shuffle ? 2.5 : 1.0;
+  state.plan = state.plan.map(rid => { const r = rid && recipeById(rid); return (r && r.meat && !state.meats[r.meat]) ? null : (r ? rid : null); });
+  const uses = {};
+  state.plan.forEach(r => { if (r) uses[r] = (uses[r] || 0) + 1; });
+  const jit = {}; allRecipes().forEach(r => { jit[r.id] = Math.random() * rnd; });
+  const last = new Set(state.last || []);
+  const need = new Set(neededIds());
+  const marg = r => rItems(r).reduce((s, id) => (state.pantry[id] || need.has(id)) ? s : s + itemCost(id), 0)
+    + (uses[r.id] || 0) * 2 + (last.has(r.id) ? 2 : 0) + (jit[r.id] || 0);
+  const take = (slot, r) => { state.plan[slot] = r.id; uses[r.id] = (uses[r.id] || 0) + 1; rItems(r).forEach(id => { if (!state.pantry[id]) need.add(id); }); };
+  const day = s => Math.floor(s / 2);
+  const dinnerOrder = [7, 3, 9, 5, 1]; // Thu, Tue, Fri, Wed, Mon dinners
+  const lunchOrder = [6, 4, 8, 2];
+  const present = new Set(state.plan.map(r => r && recipeById(r)).filter(r => r && r.meat).map(r => r.meat));
+  const recs = allRecipes();
+  for (const m of MEATS) {
+    if (!state.meats[m] || present.has(m)) continue;
+    let slot = dinnerOrder.find(s => state.plan[s] == null);
+    let t = "dinner";
+    if (slot === undefined && replaceForMeat) {
+      slot = dinnerOrder.find(s => { const r = state.plan[s] && recipeById(state.plan[s]); return !r || !r.meat; });
+    }
+    if (slot === undefined) { slot = lunchOrder.find(s => state.plan[s] == null); t = "lunch"; }
+    if (slot === undefined) continue;
+    const pool = recs.filter(r => r.meat === m && fits(r, t) && (r.minDay || 0) <= day(slot));
+    if (!pool.length) continue;
+    pool.sort((a, b) => (marg(a) - marg(b)) || a.name.localeCompare(b.name));
+    take(slot, pool[0]);
+  }
+  for (let s = 0; s < 10; s++) {
+    if (state.plan[s] != null) continue;
+    const t = s % 2 === 0 ? "lunch" : "dinner";
+    const c = recs.filter(r => fits(r, t) && !r.meat && (uses[r.id] || 0) < 2 && (r.minDay || 0) <= day(s));
+    if (!c.length) continue;
+    c.sort((a, b) => (marg(a) - marg(b)) || a.name.localeCompare(b.name));
+    take(s, c[0]);
+  }
+}
+</script>
+
+<script>
+/* ---------- app: storage, screens, updates ---------- */
+const LS_KEY = "grocery-planner-v2";
+const LS_DATA = "grocery-planner-data";
+const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, mealErr:"", dataMsg:""};
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function loadLocal(){
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) return normalize(JSON.parse(raw)); } catch (e) {}
+  return null;
+}
+function save(){
+  state.updatedAt = Date.now();
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function setStatus(){
+  const el = $("sync"); if (!el) return;
+  const on = navigator.onLine !== false;
+  el.textContent = on ? "Online" : "Offline, saved on phone";
+  el.className = "sync" + (on ? " ok" : "");
+}
+
+/* ---------- screens ---------- */
+function storeOptions(sel){ return STORE_KEYS.map(s => `<option value="${s}"${s === sel ? " selected" : ""}>${STORES[s]}</option>`).join(""); }
+function tagFor(kind){
+  if (kind === "sale") return '<span class="tag sale">Sale</span>';
+  if (kind === "logged") return '<span class="tag you">Your price</span>';
+  if (kind === "est") return '<span class="tag">est.</span>';
+  return "";
+}
+function slotSelect(i){
+  const t = i % 2 === 0 ? "lunch" : "dinner"; const d = Math.floor(i / 2); const cur = state.plan[i];
+  const opts = allRecipes().filter(r => fits(r, t) && (r.minDay || 0) <= d && (!r.meat || state.meats[r.meat] || r.id === cur));
+  return `<select data-act="slot" data-i="${i}" aria-label="${DAYS[d]} ${t}"><option value="">Choose a ${t}</option>` +
+    opts.map(r => `<option value="${esc(r.id)}"${r.id === cur ? " selected" : ""}>${esc(r.name)}</option>`).join("") + `</select>`;
+}
+function viewPlan(){
+  const t = totals(); const left = round2(state.budget - t.planned); const over = left < 0;
+  const pct = state.budget > 0 ? Math.min(100, t.planned / state.budget * 100) : 100;
+  const veg = MEATS.every(m => !state.meats[m]);
+  let h = `<section class="card">
+    <div class="row between"><div><div class="tiny muted">Groceries planned</div><div class="big">${money(t.planned)}</div></div>
+    <div style="text-align:right"><div class="tiny muted">${over ? "Over budget by" : "Left of budget"}</div><div class="big" style="color:${over ? "var(--bad)" : "var(--accent)"}">${money(Math.abs(left))}</div></div></div>
+    <div class="bar${over ? " over" : ""}"><i style="width:${pct}%"></i></div>
+    <div class="row" style="gap:12px;margin-top:10px">
+      <label class="small muted" for="budget">Weekly budget $</label>
+      <input id="budget" data-act="budget" type="number" inputmode="decimal" min="0" step="1" value="${state.budget}" style="width:90px">
+    </div>
+    <div class="small muted" style="margin-top:8px">Items you already have are left off the total. Prices marked est. are guesses until you log real ones.</div>
+  </section>
+  <section class="card">
+    <h2>${veg ? "Vegetarian week" : "This week includes"}</h2>
+    <div class="small muted">Eggs and dairy are always in. Tap one to add a meal with it, tap again to remove it.</div>
+    <div class="chips">${MEATS.map(m => `<button class="chip" data-act="meat" data-m="${m}" aria-pressed="${state.meats[m]}">${MEAT_LABEL[m]}</button>`).join("")}</div>
+    <div class="row" style="margin-top:6px"><label class="small muted" for="pref">Shop first at</label>
+      <select id="pref" data-act="pref" style="width:auto">${storeOptions(state.pref)}</select></div>
+    <div class="btns"><button class="btn" data-act="fill">Fill empty meals</button><button class="btn ghost" data-act="shuffle">Shuffle all</button><button class="btn ghost" data-act="clear">Clear</button></div>
+  </section>`;
+  for (let d = 0; d < 5; d++) {
+    h += `<section class="card day"><div class="dn">${DAYS[d]}</div>
+      <label>Lunch</label>${slotSelect(d * 2)}<label>Dinner</label>${slotSelect(d * 2 + 1)}</section>`;
+  }
+  return h;
+}
+function viewPantry(){
+  const used = planIds();
+  const have = ITEMS.filter(i => state.pantry[i.id]).length;
+  let h = `<section class="card"><h2>What I have on hand</h2>
+    <div class="small muted">Switch on what is already in your kitchen. Those items drop off your shopping list and the planner favors meals that use them. ${have} on hand now.</div></section>`;
+  CATS.forEach(c => {
+    const list = ITEMS.filter(i => i.cat === c);
+    if (!list.length) return;
+    h += `<h3>${esc(c)}</h3><section class="card" style="padding:4px 14px">` + list.map(i => `
+      <label class="item"><input type="checkbox" data-act="pantry" data-id="${esc(i.id)}"${state.pantry[i.id] ? " checked" : ""}>
+        <span class="nm"><span class="n">${esc(i.name)}</span> <span class="muted small">${esc(i.unit)}</span>
+        ${used.has(i.id) ? '<div class="tiny muted">In this week\'s plan</div>' : ""}</span></label>`).join("") + `</section>`;
+  });
+  return h;
+}
+function viewShop(){
+  const entries = listEntries(); const t = totals();
+  const order = [state.pref].concat(STORE_KEYS.filter(s => s !== state.pref));
+  let h = `<section class="card"><div class="row between">
+      <div><div class="tiny muted">Planned</div><div class="big">${money(t.planned)}</div></div>
+      <div style="text-align:right"><div class="tiny muted">Spent so far</div><div class="big">${t.anyActual ? money(t.spent) : "$0.00"}</div></div></div>
+      <div class="small muted" style="margin-top:8px">Type the price from the shelf or receipt. It also goes into your price book.</div></section>`;
+  if (!entries.length) h += `<p class="empty">Nothing to buy yet. Plan some meals first, or add an extra item below.</p>`;
+  order.forEach(s => {
+    const list = entries.filter(e => e.store === s);
+    if (!list.length) return;
+    const sub = round2(list.reduce((a, e) => a + e.price, 0));
+    h += `<div class="grp"><b>${STORES[s]}</b><span class="muted">${money(sub)}</span></div><section class="card" style="padding:4px 14px">` +
+      list.map(e => `<div class="item${state.checked[e.id] ? " done" : ""}">
+        <input type="checkbox" data-act="check" data-id="${esc(e.id)}"${state.checked[e.id] ? " checked" : ""} aria-label="Got ${esc(e.name)}">
+        <div class="nm"><div><span class="n">${esc(e.name)}</span> <span class="muted small">${esc(e.unit)}</span></div>
+          <div class="meta"><select data-act="move" data-id="${esc(e.id)}" aria-label="Store for ${esc(e.name)}">${storeOptions(e.store)}</select>${tagFor(e.kind)}
+          ${e.extra ? `<button class="btn ghost mini" data-act="delextra" data-id="${esc(e.id)}">Remove</button>` : ""}</div></div>
+        <input class="amt" type="number" inputmode="decimal" step="0.01" min="0" data-act="actual" data-id="${esc(e.id)}" placeholder="${e.price.toFixed(2)}" value="${typeof state.actual[e.id] === "number" ? state.actual[e.id] : ""}" aria-label="Price paid for ${esc(e.name)}">
+      </div>`).join("") + `</section>`;
+  });
+  h += `<h3>Add an extra item</h3><section class="card">
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <input id="xname" type="text" placeholder="Item" style="flex:2;min-width:120px">
+      <input id="xprice" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Price" style="flex:1;min-width:80px">
+    </div>
+    <div class="row" style="gap:8px;margin-top:8px"><select id="xstore" style="flex:1">${storeOptions(state.pref)}</select><button class="btn" data-act="addextra">Add</button></div></section>`;
+  h += `<section class="card"><h2>Share or save the list</h2>
+    <div class="small muted">Copy the list to paste into Notes or a text.</div>
+    <div class="btns"><button class="btn" data-act="copy">Copy list</button>
+    <button class="btn ${ui.confirmNew ? "warn" : "ghost"}" data-act="newweek">${ui.confirmNew ? "Tap again to start a new week" : "Start a new week"}</button></div>
+    ${ui.copyText ? `<div class="small muted" style="margin-top:10px">Press and hold in the box, choose Select All, then Copy.</div><textarea id="copybox" readonly>${esc(ui.copyText)}</textarea>` : ""}
+    ${ui.confirmNew ? `<div class="small muted" style="margin-top:8px">A new week clears the plan, checkmarks, prices paid, and extras, and switches the meat options off. Your pantry, price book, and meals stay.</div>` : ""}
+  </section>`;
+  return h;
+}
+function mealLine(r){
+  const names = rItems(r).map(id => ITEM_BY[id].name.toLowerCase()).join(", ");
+  const tag = r.type === "lunch" ? "Lunch" : r.type === "dinner" ? "Dinner" : "Lunch or dinner";
+  return `<div class="mrow"><div><div style="font-weight:500">${esc(r.name)}</div><div class="tiny muted">${r.edited ? "Edited · " : ""}${esc(tag)}${names ? " · " + esc(names) : ""}</div></div>` +
+    `<div class="row" style="gap:6px"><button class="btn ghost mini" data-act="editmeal" data-id="${esc(r.id)}">Edit</button>` +
+    (r.custom ? `<button class="btn ghost mini" data-act="removemeal" data-id="${esc(r.id)}">Remove</button>` : "") + `</div></div>`;
+}
+function mealForm(){
+  const ed = ui.editId ? recipeById(ui.editId) : null;
+  const sel = (v, cur) => v === cur ? " selected" : "";
+  return `<section class="card"><h2>${ed ? "Edit meal" : "New meal"}</h2>
+    <label class="small muted" for="mname">Name</label><input id="mname" type="text" placeholder="Rice and eggs" value="${ed ? esc(ed.name) : ""}" style="width:100%">
+    <div class="row" style="gap:8px;margin-top:10px"><div style="flex:1"><label class="small muted" for="mtype">When</label>
+      <select id="mtype"><option value="any"${sel("any", ed && ed.type)}>Lunch or dinner</option><option value="lunch"${sel("lunch", ed && ed.type)}>Lunch</option><option value="dinner"${sel("dinner", ed && ed.type)}>Dinner</option></select></div>
+      <div style="flex:1"><label class="small muted" for="mmeat">Contains</label>
+      <select id="mmeat"><option value="">No meat or fish</option>${MEATS.map(m => `<option value="${m}"${sel(m, ed && ed.meat)}>${MEAT_LABEL[m]}</option>`).join("")}</select></div></div>
+    <div class="small muted" style="margin-top:10px">Ingredients</div>
+    <div class="ings">${ITEMS.map(i => `<label class="item"><input type="checkbox" class="ing" value="${esc(i.id)}"${ed && ed.items.includes(i.id) ? " checked" : ""}><span class="n">${esc(i.name)}</span></label>`).join("")}</div>
+    <div class="small muted">Missing an ingredient? Ask Claude to add it to the shared list.</div>
+    ${ui.mealErr ? `<div class="err">${esc(ui.mealErr)}</div>` : ""}
+    <div class="btns"><button class="btn" data-act="savemeal">Save meal</button><button class="btn ghost" data-act="cancelmeal">Cancel</button>
+    ${ed && ed.edited ? `<button class="btn ghost" data-act="resetmeal">Reset to original</button>` : ""}</div></section>`;
+}
+function viewMeals(){
+  const recs = allRecipes();
+  let h = `<section class="card"><h2>${recs.length} meals</h2>
+    <div class="small muted">The planner picks from these. Tap Edit on any meal to change it, or add your own.</div>
+    <div class="btns"><button class="btn" data-act="addmeal">Add my own meal</button></div></section>`;
+  if (ui.addMeal) h += mealForm();
+  const groups = [["My meals", r => r.custom], ["Vegetarian", r => !r.custom && !r.meat], ["Fish", r => !r.custom && r.meat === "fish"],
+    ["Chicken", r => !r.custom && r.meat === "chicken"], ["Beef", r => !r.custom && r.meat === "beef"], ["Bacon", r => !r.custom && r.meat === "bacon"]];
+  groups.forEach(g => {
+    const list = recs.filter(g[1]);
+    if (!list.length) return;
+    h += `<h3>${g[0]} (${list.length})</h3><section class="card" style="padding:4px 14px">${list.map(mealLine).join("")}</section>`;
+  });
+  return h;
+}
+function daysAgo(dateStr){
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(dateStr || ""));
+  if (!m) return null;
+  const then = new Date(+m[1], +m[2] - 1, +m[3]);
+  return Math.floor((Date.now() - then.getTime()) / 86400000);
+}
+function viewPrices(){
+  let h = "";
+  const items = (ads.items || []).filter(a => a && STORES[a.store] && typeof a.price === "number");
+  const age = daysAgo(ads.updated);
+  h += `<section class="card"><h2>This week's ads</h2>`;
+  if (!items.length) {
+    h += `<div class="empty">No ads loaded yet. Ask Claude to load a weekly ad (a photo, screenshot, or link works) and the sale items will show up here after you tap Check for updates.</div>`;
+  } else {
+    h += `<div class="small muted">Updated ${esc(ads.updated || "recently")}${age !== null && age > 8 ? ` <b style="color:var(--warn)">(${age} days old, may be out of date)</b>` : ""}</div>`;
+    STORE_KEYS.forEach(s => {
+      const list = items.filter(a => a.store === s);
+      if (!list.length) return;
+      h += `<div class="grp" style="margin-bottom:2px"><b>${STORES[s]}</b></div>` + list.map(a => `<div class="sale-line"><span>${esc(a.label || (ITEM_BY[a.itemId] || {}).name || "Item")}${a.until ? ` <span class="tiny muted">until ${esc(a.until)}</span>` : ""}</span><b>${money(a.price)}</b></div>`).join("");
+    });
+    h += `<div class="tiny muted" style="margin-top:8px">Sales on items in your price book are used automatically when planning.</div>`;
+  }
+  h += `<div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap"><button class="btn ghost" data-act="checkdata">Check for updates</button>
+    <span class="small muted">Meals and ads from ${esc(dataUpdated || "the app")}. ${esc(ui.dataMsg)}</span></div></section>`;
+  h += `<section class="card"><h2>My stores</h2><div class="small muted">Check the stores you shop at. Prices for stores other than the ones in the weekly ads start as estimates; type in real prices in the price book below as you see them.</div>
+    <div class="ings">${Object.keys(STORES).map(k => `<label class="item"><input type="checkbox" data-act="storetoggle" data-s="${k}"${STORE_KEYS.includes(k) ? " checked" : ""}><span class="n">${esc(STORES[k])}</span></label>`).join("")}</div></section>`;
+  h += `<section class="card"><h2>Store rules</h2>
+    <div class="row" style="gap:10px"><label for="pref2" class="small muted" style="flex:1">Preferred store</label>
+      <select id="pref2" data-act="pref" style="width:auto">${storeOptions(state.pref)}</select></div>
+    <div class="row" style="gap:10px;margin-top:8px"><label for="thr" class="small muted" style="flex:1">Go elsewhere only if cheaper by $</label>
+      <input id="thr" data-act="thr" type="number" inputmode="decimal" step="0.25" min="0" value="${state.threshold}" style="width:80px"></div>
+    <div class="small muted" style="margin-top:8px">An item moves off your preferred store only when another store has a real logged price or a sale that beats it by that much. Use the store menu on any shopping row to override one item.</div></section>`;
+  h += `<h3>Price book</h3><section class="card" style="padding:8px 10px"><table class="pb"><thead><tr><th style="width:34%">Item</th>${STORE_KEYS.map(s => `<th>${STORE_SHORT[s]}</th>`).join("")}</tr></thead><tbody>` +
+    ITEMS.map(i => `<tr><td><div class="pn">${esc(i.name)}</div><div class="tiny muted">est. ${money(i.est)}</div>
+      <select data-act="ovr" data-id="${esc(i.id)}" aria-label="Always buy ${esc(i.name)} at"><option value="">Auto</option>${STORE_KEYS.map(s => `<option value="${s}"${state.overrides[i.id] === s ? " selected" : ""}>${STORES[s]}</option>`).join("")}</select></td>` +
+      STORE_KEYS.map(s => { const v = (state.prices[i.id] || {})[s]; return `<td><input type="number" inputmode="decimal" step="0.01" min="0" data-act="price" data-id="${esc(i.id)}" data-s="${s}" value="${typeof v === "number" ? v : ""}" placeholder="-" aria-label="${esc(i.name)} at ${STORES[s]}"></td>`; }).join("") + `</tr>`).join("") +
+    `</tbody></table></section>`;
+  return h;
+}
+
+const VIEWS = {plan:viewPlan, pantry:viewPantry, shop:viewShop, meals:viewMeals, prices:viewPrices};
+const TABS = [["plan","Plan"],["pantry","Pantry"],["shop","Shop"],["meals","Meals"],["prices","Prices"]];
+function render(){
+  const y = window.scrollY;
+  $("view").innerHTML = VIEWS[ui.tab]();
+  $("nav").innerHTML = TABS.map(t => `<button data-act="tab" data-tab="${t[0]}"${ui.tab === t[0] ? ' aria-current="page"' : ""}>${t[1]}</button>`).join("");
+  window.scrollTo(0, y);
+}
+
+/* ---------- updates from the web ---------- */
+async function fetchData(manual){
+  try {
+    const r = await fetch("../data.json", {cache:"no-store"});
+    if (!r.ok) throw new Error("http " + r.status);
+    const d = await r.json();
+    if (!validData(d)) throw new Error("bad data");
+    if ((d.version || 0) >= curVersion) {
+      applyData(d);
+      try { localStorage.setItem(LS_DATA, JSON.stringify(d)); } catch (e) {}
+      if (state.plan.every(x => x == null)) fillPlan(true, false);
+      ui.dataMsg = "Up to date.";
+    }
+  } catch (e) {
+    if (manual) ui.dataMsg = "Could not reach updates. Using the saved copy.";
+  }
+  const a = document.activeElement;
+  if (manual || !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) render();
+}
+
+/* ---------- actions ---------- */
+function parseMoney(v){
+  const n = parseFloat(String(v).replace(/[^0-9.]/g, ""));
+  return Number.isFinite(n) && n >= 0 ? round2(n) : null;
+}
+function listText(){
+  const entries = listEntries();
+  const order = [state.pref].concat(STORE_KEYS.filter(s => s !== state.pref));
+  const parts = [];
+  order.forEach(s => {
+    const list = entries.filter(e => e.store === s);
+    if (!list.length) return;
+    parts.push(STORES[s] + " (" + money(round2(list.reduce((a, e) => a + e.price, 0))) + ")\n" + list.map(e => "[ ] " + e.name + (e.unit ? ", " + e.unit : "")).join("\n"));
+  });
+  return parts.join("\n\n") || "Nothing on the list yet.";
+}
+async function copyList(){
+  const text = listText();
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+  ui.copyText = ok ? "" : text;
+  if (ok) { const el = $("sync"); if (el) { el.textContent = "List copied"; el.className = "sync ok"; setTimeout(setStatus, 2000); } }
+  render();
+}
+const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","editmeal","resetmeal","checkdata"]);
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-act]"); if (!el) return;
+  const a = el.dataset.act; if (!CLICK_ACTS.has(a)) return;
+  if (a !== "newweek" && ui.confirmNew) ui.confirmNew = false;
+  if (a === "tab") { ui.tab = el.dataset.tab; ui.copyText = ""; ui.confirmNew = false; render(); window.scrollTo(0, 0); return; }
+  if (a === "meat") { const m = el.dataset.m; state.meats[m] = !state.meats[m]; fillPlan(true, false); save(); render(); return; }
+  if (a === "fill") { fillPlan(true, false); save(); render(); return; }
+  if (a === "shuffle") { state.plan = new Array(10).fill(null); fillPlan(true, true); save(); render(); return; }
+  if (a === "clear") { state.plan = new Array(10).fill(null); state.checked = {}; save(); render(); return; }
+  if (a === "copy") { copyList(); return; }
+  if (a === "checkdata") { ui.dataMsg = "Checking..."; render(); fetchData(true); return; }
+  if (a === "newweek") {
+    if (!ui.confirmNew) { ui.confirmNew = true; render(); return; }
+    ui.confirmNew = false;
+    state.last = [...new Set(state.plan.filter(Boolean))];
+    state.plan = new Array(10).fill(null); state.checked = {}; state.actual = {}; state.extras = [];
+    state.meats = {fish:false,chicken:false,beef:false,bacon:false};
+    fillPlan(true, false); save(); render(); window.scrollTo(0, 0); return;
+  }
+  if (a === "addextra") {
+    const name = ($("xname").value || "").trim(); const price = parseMoney($("xprice").value);
+    if (!name) { $("xname").focus(); return; }
+    state.extras.push({id:"x" + Date.now().toString(36), name, price:price === null ? 0 : price, store:$("xstore").value});
+    save(); render(); return;
+  }
+  if (a === "delextra") {
+    const id = el.dataset.id;
+    state.extras = state.extras.filter(x => x.id !== id); delete state.checked[id]; delete state.actual[id];
+    save(); render(); return;
+  }
+  if (a === "editmeal") { ui.addMeal = true; ui.editId = el.dataset.id; ui.mealErr = ""; render(); window.scrollTo(0, 0); return; }
+  if (a === "resetmeal") { delete state.edits[ui.editId]; ui.addMeal = false; ui.editId = null; ui.mealErr = ""; save(); render(); return; }
+  if (a === "addmeal") { ui.addMeal = true; ui.editId = null; ui.mealErr = ""; render(); const n = $("mname"); if (n) n.focus(); return; }
+  if (a === "cancelmeal") { ui.addMeal = false; ui.editId = null; ui.mealErr = ""; render(); return; }
+  if (a === "savemeal") {
+    const name = ($("mname").value || "").trim();
+    const items = [...document.querySelectorAll(".ing")].filter(c => c.checked).map(c => c.value);
+    if (!name) { ui.mealErr = "Give the meal a name."; render(); return; }
+    if (!items.length) { ui.mealErr = "Pick at least one ingredient."; render(); return; }
+    const vals = {name, type:$("mtype").value, meat:$("mmeat").value || null, items};
+    if (ui.editId) {
+      const c = state.custom.find(r => r.id === ui.editId);
+      if (c) Object.assign(c, vals); else state.edits[ui.editId] = vals;
+    } else state.custom.push(Object.assign({id:"c" + Date.now().toString(36), custom:true}, vals));
+    ui.addMeal = false; ui.editId = null; ui.mealErr = ""; save(); render(); return;
+  }
+  if (a === "removemeal") {
+    const id = el.dataset.id;
+    state.custom = state.custom.filter(r => r.id !== id);
+    state.plan = state.plan.map(x => x === id ? null : x);
+    save(); render(); return;
+  }
+});
+document.addEventListener("change", ev => {
+  const el = ev.target.closest("[data-act]"); if (!el) return;
+  const a = el.dataset.act; if (CLICK_ACTS.has(a)) return;
+  const id = el.dataset.id;
+  if (a === "slot") { state.plan[+el.dataset.i] = el.value || null; }
+  else if (a === "pantry") { if (el.checked) state.pantry[id] = true; else delete state.pantry[id]; }
+  else if (a === "check") { if (el.checked) state.checked[id] = true; else delete state.checked[id]; }
+  else if (a === "budget") { const n = parseMoney(el.value); if (n !== null) state.budget = n; }
+  else if (a === "pref") { state.pref = el.value; }
+  else if (a === "storetoggle") {
+    const k = el.dataset.s, cur = state.stores.slice();
+    const next = el.checked ? (cur.includes(k) ? cur : cur.concat(k)) : cur.filter(x => x !== k);
+    state.stores = next; syncStores(state);
+  }
+  else if (a === "thr") { const n = parseMoney(el.value); if (n !== null) state.threshold = n; }
+  else if (a === "ovr") { if (el.value) state.overrides[id] = el.value; else delete state.overrides[id]; }
+  else if (a === "move") {
+    const x = state.extras.find(q => q.id === id);
+    if (x) x.store = el.value; else state.overrides[id] = el.value;
+  }
+  else if (a === "actual") {
+    const n = parseMoney(el.value);
+    if (n === null || el.value === "") { delete state.actual[id]; }
+    else {
+      state.actual[id] = n;
+      const e = listEntries().find(q => q.id === id);
+      if (e && !e.extra && n > 0) { state.prices[id] = Object.assign({}, state.prices[id], {[e.store]: n}); }
+    }
+  }
+  else if (a === "price") {
+    const n = parseMoney(el.value); const s = el.dataset.s;
+    const cur = Object.assign({}, state.prices[id]);
+    if (n === null || el.value === "" || n === 0) delete cur[s]; else cur[s] = n;
+    if (Object.keys(cur).length) state.prices[id] = cur; else delete state.prices[id];
+  }
+  save(); render();
+});
+
+/* ---------- start ---------- */
+(function init(){
+  let data = EMBED;
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_DATA) || "null");
+    if (validData(s) && (s.version || 0) > (EMBED.version || 0)) data = s;
+  } catch (e) {}
+  setData(data); // so the saved state can be checked against real meals
+  const local = loadLocal();
+  const firstRun = !local;
+  state = local || defaults(); syncStores(state);
+  applyData(data);
+  if (state.plan.every(x => x == null)) { fillPlan(true, false); save(); }
+  render(); setStatus();
+  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("../sw.js").catch(() => {}); } catch (e) {} }
+  window.addEventListener("online", () => { setStatus(); fetchData(false); });
+  window.addEventListener("offline", setStatus);
+  fetchData(false);
+})();
+</script>
+</body>
+</html>
