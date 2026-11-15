@@ -1,6 +1,6 @@
 /* Offline cache for Grocery Planner. Pages load from the cache first; data.json tries the network first. */
-const CACHE = "gp-cache-4";
-const CORE = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "data.json", "tx/", "tx/index.html", "tx/manifest.webmanifest"];
+const CACHE = "gp-cache-5";
+const CORE = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "data.json", "family.json", "tx/", "tx/index.html", "tx/manifest.webmanifest"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, {cache: "reload"})))).then(() => self.skipWaiting()));
 });
@@ -12,7 +12,7 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
-  if (url.pathname.endsWith("/data.json")) {
+  if (url.pathname.endsWith("/data.json") || url.pathname.endsWith("/family.json")) {
     e.respondWith(
       fetch(req, {cache: "no-store"}).then(r => {
         if (r && r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); }

@@ -92,6 +92,12 @@ nav button[aria-current="page"]{background:var(--tint);color:var(--accent);font-
 .empty{color:var(--muted);padding:6px 0}
 .sale-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
 .sale-line b{color:var(--sale);font-variant-numeric:tabular-nums}
+details.fam{border-top:1px solid var(--line);padding:10px 0}
+details.fam:first-of-type{border-top:0}
+details.fam summary{cursor:pointer;list-style:none}
+details.fam summary::-webkit-details-marker{display:none}
+details.fam ul,details.fam ol{margin:6px 0 6px 20px;padding:0}
+details.fam li{margin:3px 0}
 .ings{max-height:280px;overflow:auto;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;margin:6px 0}
 .ings .item{padding:6px 0}
 .mrow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
@@ -169,14 +175,14 @@ function defaults(){
   return {v:2, updatedAt:0, budget:40, pref:"harter", stores:DEFAULT_STORES.slice(), threshold:0.5,
     meats:{fish:false,chicken:false,beef:false,bacon:false},
     pantry:{soy:true,mayo:true}, plan:new Array(10).fill(null),
-    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[]};
+    prices:{}, overrides:{}, checked:{}, actual:{}, extras:[], custom:[], last:[], edits:{}, hidden:[], myItems:[], famSeen:[]};
 }
 let state = defaults();
 function normalize(s){
   const o = Object.assign(defaults(), s || {});
   o.meats = Object.assign(defaults().meats, o.meats || {});
   ["pantry","prices","overrides","checked","actual","edits"].forEach(k => { if (!o[k] || typeof o[k] !== "object" || Array.isArray(o[k])) o[k] = {}; });
-  ["extras","custom","last","hidden","myItems"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  ["extras","custom","last","hidden","myItems","famSeen"].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
   const known = id => !!RECIPE_BY[id] || o.custom.some(r => r && r.id === id);
   o.plan = (Array.isArray(o.plan) && o.plan.length === 10) ? o.plan.map(x => known(x) ? x : null) : new Array(10).fill(null);
   o.myItems = o.myItems.filter(i => i && i.id && i.name && CATS.includes(i.cat) && typeof i.est === "number");
@@ -305,7 +311,7 @@ function fillPlan(replaceForMeat, shuffle, pantryOnly){
 /* ---------- app: storage, screens, updates ---------- */
 const LS_KEY = "grocery-planner-v2";
 const LS_DATA = "grocery-planner-data";
-const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, itemErr:"", planMsg:"", mealErr:"", dataMsg:""};
+const ui = {tab:"plan", copyText:"", confirmNew:false, addMeal:false, editId:null, itemErr:"", planMsg:"", fam:false, famFilter:"", famNew:{}, mealErr:"", dataMsg:""};
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -449,9 +455,49 @@ function mealForm(){
     <div class="btns"><button class="btn" data-act="savemeal">Save meal</button><button class="btn ghost" data-act="cancelmeal">Cancel</button>
     ${ed && ed.edited ? `<button class="btn ghost" data-act="resetmeal">Reset to original</button>` : ""}</div></section>`;
 }
+const LS_FAM = "grocery-planner-family";
+let FAMILY = {updated:null, recipes:[]};
+function validFam(d){
+  return !!d && Array.isArray(d.recipes) && d.recipes.every(r => r && r.id && r.title && Array.isArray(r.ingredients) && Array.isArray(r.steps));
+}
+function famUnseen(){ const seen = new Set(state.famSeen || []); return FAMILY.recipes.filter(r => !seen.has(r.id)); }
+function famRecipe(r){
+  const isNew = !!ui.famNew[r.id];
+  return `<details class="fam"><summary><b>${esc(r.title)}</b>${isNew ? ' <span class="tag sale">New</span>' : ""}
+    <div class="tiny muted">${r.from ? "From " + esc(r.from) : ""}${r.from && r.sharedBy ? " · " : ""}${r.sharedBy ? "Shared by " + esc(r.sharedBy) : ""}${r.servings ? " · " + esc(r.servings) : ""}</div></summary>
+    ${r.note ? `<div class="small muted" style="margin-top:6px">${esc(r.note)}</div>` : ""}
+    <div class="small muted" style="margin-top:8px">Ingredients</div><ul>${r.ingredients.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <div class="small muted">Directions</div><ol>${r.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol></details>`;
+}
+function viewFamily(){
+  const froms = [...new Set(FAMILY.recipes.map(r => r.from).filter(Boolean))].sort();
+  const list = FAMILY.recipes.filter(r => !ui.famFilter || r.from === ui.famFilter);
+  let h = `<section class="card"><div class="row" style="gap:10px"><h2 style="flex:1;margin:0">Family recipes</h2><button class="btn ghost mini" data-act="closefam">Back</button></div>
+    <div class="small muted" style="margin-top:6px">Tap a recipe to open it. These save to your phone, so they work offline after one visit with a connection. To add one, send it to Jessica.</div>
+    ${froms.length > 1 ? `<div class="row" style="gap:8px;margin-top:10px"><label class="small muted" for="famf" style="flex:1">Show recipes from</label><select id="famf" data-act="famfilter" style="width:auto"><option value="">Everyone</option>${froms.map(f => `<option value="${esc(f)}"${ui.famFilter === f ? " selected" : ""}>${esc(f)}</option>`).join("")}</select></div>` : ""}</section>`;
+  if (!FAMILY.recipes.length) return h + `<div class="empty">No family recipes yet. Once Jessica adds some, they will show up here the next time you open the app with a connection.</div>`;
+  return h + `<section class="card" style="padding:4px 14px">${list.map(famRecipe).join("")}</section>`;
+}
+async function fetchFamily(){
+  try {
+    const r = await fetch("family.json", {cache:"no-store"});
+    if (!r.ok) throw new Error("http " + r.status);
+    const d = await r.json();
+    if (!validFam(d)) throw new Error("bad family data");
+    FAMILY = d;
+    try { localStorage.setItem(LS_FAM, JSON.stringify(d)); } catch (e) {}
+    const a = document.activeElement;
+    if (!(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) render();
+  } catch (e) {}
+}
 function viewMeals(){
+  if (ui.fam) return viewFamily();
   const recs = allRecipesAll(), hid = state.hidden || [];
-  let h = `<section class="card"><h2>${recs.length - recs.filter(r => hid.includes(r.id)).length} meals</h2>
+  const nNew = famUnseen().length;
+  let h = `<section class="card"><h2>Family recipes${nNew ? ` <span class="tag sale">${nNew} new</span>` : ""}</h2>
+    <div class="small muted">Recipes passed down and shared by the family, with who they came from. ${FAMILY.recipes.length} so far.</div>
+    <div class="btns"><button class="btn" data-act="openfam">Open family recipes</button></div></section>`;
+  h += `<section class="card"><h2>${recs.length - recs.filter(r => hid.includes(r.id)).length} meals</h2>
     <div class="small muted">The planner picks from these. Tap Edit to change a meal, or Hide to stop the planner using it. Hiding only affects your phone.</div>
     <div class="btns"><button class="btn" data-act="addmeal">Add my own meal</button></div></section>`;
   if (ui.addMeal) h += mealForm();
@@ -511,7 +557,7 @@ const TABS = [["plan","Plan"],["pantry","Pantry"],["shop","Shop"],["meals","Meal
 function render(){
   const y = window.scrollY;
   $("view").innerHTML = VIEWS[ui.tab]();
-  $("nav").innerHTML = TABS.map(t => `<button data-act="tab" data-tab="${t[0]}"${ui.tab === t[0] ? ' aria-current="page"' : ""}>${t[1]}</button>`).join("");
+  $("nav").innerHTML = TABS.map(t => `<button data-act="tab" data-tab="${t[0]}"${ui.tab === t[0] ? ' aria-current="page"' : ""}>${t[1]}${t[0] === "meals" && famUnseen().length ? " \u2022" : ""}</button>`).join("");
   window.scrollTo(0, y);
 }
 
@@ -559,13 +605,15 @@ async function copyList(){
   if (ok) { const el = $("sync"); if (el) { el.textContent = "List copied"; el.className = "sync ok"; setTimeout(setStatus, 2000); } }
   render();
 }
-const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","additem","delitem","fillpantry","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
+const CLICK_ACTS = new Set(["tab","meat","fill","shuffle","clear","copy","newweek","addextra","delextra","addmeal","savemeal","cancelmeal","removemeal","openfam","closefam","additem","delitem","fillpantry","editmeal","hidemeal","showmeal","resetmeal","checkdata"]);
 document.addEventListener("click", ev => {
   const el = ev.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; if (!CLICK_ACTS.has(a)) return;
   if (a !== "newweek" && ui.confirmNew) ui.confirmNew = false;
   if (a === "tab") { ui.tab = el.dataset.tab; ui.copyText = ""; ui.confirmNew = false; render(); window.scrollTo(0, 0); return; }
   if (a === "meat") { const m = el.dataset.m; state.meats[m] = !state.meats[m]; fillPlan(true, false); save(); render(); return; }
+  if (a === "openfam") { ui.fam = true; ui.famFilter = ""; ui.famNew = {}; famUnseen().forEach(r => { ui.famNew[r.id] = true; }); state.famSeen = FAMILY.recipes.map(r => r.id); save(); render(); window.scrollTo(0, 0); return; }
+  if (a === "closefam") { ui.fam = false; render(); window.scrollTo(0, 0); return; }
   if (a === "additem") {
     const name = ($("uname").value || "").trim(); const pr = parseMoney($("uprice").value);
     if (!name) { ui.itemErr = "Give the item a name."; render(); return; }
@@ -643,6 +691,7 @@ document.addEventListener("change", ev => {
   else if (a === "pantry") { if (el.checked) state.pantry[id] = true; else delete state.pantry[id]; }
   else if (a === "check") { if (el.checked) state.checked[id] = true; else delete state.checked[id]; }
   else if (a === "budget") { const n = parseMoney(el.value); if (n !== null) state.budget = n; }
+  else if (a === "famfilter") { ui.famFilter = el.value; }
   else if (a === "pref") { state.pref = el.value; }
   else if (a === "storetoggle") {
     const k = el.dataset.s, cur = state.stores.slice();
@@ -681,6 +730,7 @@ document.addEventListener("change", ev => {
     if (validData(s) && (s.version || 0) > (EMBED.version || 0)) data = s;
   } catch (e) {}
   setData(data); // so the saved state can be checked against real meals
+  try { const f = JSON.parse(localStorage.getItem(LS_FAM) || "null"); if (validFam(f)) FAMILY = f; } catch (e) {}
   const local = loadLocal();
   const firstRun = !local;
   state = local || defaults(); syncStores(state);
@@ -688,9 +738,10 @@ document.addEventListener("change", ev => {
   if (state.plan.every(x => x == null)) { fillPlan(true, false); save(); }
   render(); setStatus();
   if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
-  window.addEventListener("online", () => { setStatus(); fetchData(false); });
+  window.addEventListener("online", () => { setStatus(); fetchData(false); fetchFamily(); });
   window.addEventListener("offline", setStatus);
   fetchData(false);
+  fetchFamily();
 })();
 </script>
 </body>
