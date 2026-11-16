@@ -1,6 +1,6 @@
 {
- "version": 7,
- "updated": "2026-11-15",
+ "version": 8,
+ "updated": "2026-11-16",
  "items": [
   {
    "id": "onions",
@@ -589,6 +589,41 @@
    "unit": "box",
    "cat": "Pantry",
    "est": 2.5
+  },
+  {
+   "id": "cornkernel",
+   "name": "Canned corn",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
+  },
+  {
+   "id": "rotel",
+   "name": "Rotel (diced tomatoes & chilies)",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.5
+  },
+  {
+   "id": "creamcheese",
+   "name": "Cream cheese",
+   "unit": "8 oz",
+   "cat": "Dairy & eggs",
+   "est": 2.5
+  },
+  {
+   "id": "ranchmix",
+   "name": "Hidden Valley Ranch fiesta packet",
+   "unit": "packet",
+   "cat": "Pantry",
+   "est": 1.5
+  },
+  {
+   "id": "tortillachips",
+   "name": "Tortilla chips",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 3.0
   }
  ],
  "recipes": [

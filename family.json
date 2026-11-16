@@ -1,6 +1,6 @@
 {
- "version": 10,
- "updated": "2026-11-15",
+ "version": 11,
+ "updated": "2026-11-16",
  "recipes": [
   {
    "id": "herod-pecan-pie",
@@ -227,6 +227,41 @@
     "marinara"
    ],
    "submittedAt": "11/15/2026 17:49:15"
+  },
+  {
+   "id": "crockpot-fiesta-chicken",
+   "title": "Crockpot Fiesta Chicken",
+   "sharedBy": "Alaina",
+   "type": "dinner",
+   "meat": "chicken",
+   "ingredients": [
+    "2 lbs. boneless skinless chicken breasts",
+    "1 oz. packet fiesta Hidden Valley Ranch Mix",
+    "15 oz. can black beans, drained",
+    "15.25 oz. can whole kernel corn, drained",
+    "10 oz. can Rotel (DO NOT DRAIN)",
+    "8 oz. cream cheese",
+    "1 small sweet yellow onion, diced"
+   ],
+   "steps": [
+    "Add the chicken breasts to the crockpot.",
+    "Sprinkle over the ranch packet.",
+    "Add the drained corn, drained beans, Rotel, onion, and place the cream cheese block on top.",
+    "Cook on LOW for 6-8 hours or HIGH for 4 hours.",
+    "Shred the chicken and stir when done.",
+    "Serve with tortilla chips or tortillas."
+   ],
+   "items": [
+    "chicken",
+    "ranchmix",
+    "blackbeans",
+    "cornkernel",
+    "rotel",
+    "creamcheese",
+    "onions",
+    "tortillachips"
+   ],
+   "submittedAt": "11/16/2026 7:43:59"
   }
  ]
 }
