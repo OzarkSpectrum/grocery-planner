@@ -1,5 +1,5 @@
 {
- "version": 12,
+ "version": 13,
  "updated": "2026-11-16",
  "recipes": [
   {
@@ -269,7 +269,7 @@
    "from": "Mimi Glenna",
    "sharedBy": "Donna \"Giggle\"",
    "type": "dessert",
-   "note": "Typed from a photo of a handwritten card, with a story from the sender: easy to fix, and Mimi made these for Easter. A few amounts were hard to read (the sugar and flour in the filling), so please check them against the card photo.",
+   "note": "Typed from Mimi's handwritten card (photo shown). Easy to fix, and Mimi made these for Easter.",
    "ingredients": [
     "2 C. all-purpose flour",
     "1/2 C. powdered sugar",
@@ -277,8 +277,8 @@
     "1 pkg. (8 oz) cream cheese, softened",
     "2 large eggs",
     "2/3 C. (5 oz can) Carnation evaporated milk",
-    "Granulated sugar (amount hard to read on the card)",
-    "1 Tblsp. flour (hard to read on the card)",
+    "1/2 C. granulated sugar",
+    "1 Tblsp. flour",
     "1 Tblsp. lemon juice",
     "2 tsp. grated lemon peel",
     "Yellow food coloring (optional)",
@@ -302,7 +302,11 @@
     "lemons",
     "sourcream"
    ],
-   "submittedAt": "11/16/2026 19:43:19"
+   "submittedAt": "11/16/2026 19:43:19",
+   "images": [
+    "family/mimi-lemon-bars-1.jpg"
+   ],
+   "servings": "Makes 2 dozen bars"
   },
   {
    "id": "mimi-roasted-garlic-teriyaki-chicken",
@@ -312,7 +316,7 @@
    "type": "dinner",
    "meat": "chicken",
    "servings": "Makes 6 servings",
-   "note": "Typed from a photo that came with Mimi's lemon bars submission.",
+   "note": "From Mimi's recipe card (photo shown).",
    "ingredients": [
     "2/3 cup Kikkoman Roasted Garlic Teriyaki Marinade & Sauce",
     "1 tablespoon brown sugar, packed",
@@ -332,7 +336,10 @@
     "oil",
     "chicken"
    ],
-   "submittedAt": "11/16/2026 19:43:19"
+   "submittedAt": "11/16/2026 19:43:19",
+   "images": [
+    "family/mimi-teriyaki-chicken-1.jpg"
+   ]
   },
   {
    "id": "mimi-torta-italiano",
@@ -341,7 +348,7 @@
    "sharedBy": "Donna \"Giggle\"",
    "type": "other",
    "servings": "Makes 8 servings",
-   "note": "A layered turkey, spinach and cheese bake from a photo that came with Mimi's lemon bars submission. It uses ground turkey, which the planner has no toggle for, so the planner won't pick it. Choose it from the family recipe slot on any day.",
+   "note": "Layered turkey, spinach and cheese bake from Mimi's cookbook page (photos shown). It uses ground turkey, which the planner has no toggle for, so pick it from the family recipe slot on any day.",
    "ingredients": [
     "2 cups reduced-fat all-purpose baking mix",
     "1/2 cup skim milk",
@@ -379,7 +386,11 @@
     "mozzarella",
     "parmesan"
    ],
-   "submittedAt": "11/16/2026 19:43:19"
+   "submittedAt": "11/16/2026 19:43:19",
+   "images": [
+    "family/mimi-torta-italiano-1.jpg",
+    "family/mimi-torta-italiano-2.jpg"
+   ]
   }
  ]
 }
