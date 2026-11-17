@@ -1,5 +1,5 @@
 {
- "version": 8,
+ "version": 9,
  "updated": "2026-11-16",
  "items": [
   {
@@ -624,6 +624,76 @@
    "unit": "bag",
    "cat": "Pantry",
    "est": 3.0
+  },
+  {
+   "id": "powsugar",
+   "name": "Powdered sugar",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 2.5
+  },
+  {
+   "id": "evapmilk",
+   "name": "Evaporated milk",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.5
+  },
+  {
+   "id": "lemons",
+   "name": "Lemons",
+   "unit": "bag",
+   "cat": "Produce",
+   "est": 3.0
+  },
+  {
+   "id": "sourcream",
+   "name": "Sour cream",
+   "unit": "tub",
+   "cat": "Dairy & eggs",
+   "est": 2.0
+  },
+  {
+   "id": "teriyaki",
+   "name": "Roasted garlic teriyaki sauce",
+   "unit": "bottle",
+   "cat": "Pantry",
+   "est": 3.5
+  },
+  {
+   "id": "brownsugar",
+   "name": "Brown sugar",
+   "unit": "bag",
+   "cat": "Pantry",
+   "est": 2.5
+  },
+  {
+   "id": "oil",
+   "name": "Vegetable oil",
+   "unit": "bottle",
+   "cat": "Pantry",
+   "est": 3.0
+  },
+  {
+   "id": "groundturkey",
+   "name": "Ground turkey",
+   "unit": "lb",
+   "cat": "Meat & fish",
+   "est": 5.0
+  },
+  {
+   "id": "bakingmix",
+   "name": "Baking mix (Bisquick)",
+   "unit": "box",
+   "cat": "Pantry",
+   "est": 4.0
+  },
+  {
+   "id": "tomsauce",
+   "name": "Tomato sauce",
+   "unit": "can",
+   "cat": "Canned & jarred",
+   "est": 1.0
   }
  ],
  "recipes": [

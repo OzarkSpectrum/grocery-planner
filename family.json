@@ -1,5 +1,5 @@
 {
- "version": 11,
+ "version": 12,
  "updated": "2026-11-16",
  "recipes": [
   {
@@ -262,6 +262,124 @@
     "tortillachips"
    ],
    "submittedAt": "11/16/2026 7:43:59"
+  },
+  {
+   "id": "mimi-lemon-cheesecake-bars",
+   "title": "Mimi's Lemon Cheesecake Bars",
+   "from": "Mimi Glenna",
+   "sharedBy": "Donna \"Giggle\"",
+   "type": "dessert",
+   "note": "Typed from a photo of a handwritten card, with a story from the sender: easy to fix, and Mimi made these for Easter. A few amounts were hard to read (the sugar and flour in the filling), so please check them against the card photo.",
+   "ingredients": [
+    "2 C. all-purpose flour",
+    "1/2 C. powdered sugar",
+    "1 C. (2 sticks) butter, softened",
+    "1 pkg. (8 oz) cream cheese, softened",
+    "2 large eggs",
+    "2/3 C. (5 oz can) Carnation evaporated milk",
+    "Granulated sugar (amount hard to read on the card)",
+    "1 Tblsp. flour (hard to read on the card)",
+    "1 Tblsp. lemon juice",
+    "2 tsp. grated lemon peel",
+    "Yellow food coloring (optional)",
+    "1 C. sour cream"
+   ],
+   "steps": [
+    "Preheat oven to 350°.",
+    "Combine the flour and powdered sugar in a medium bowl. Cut in the butter with a pastry blender or 2 knives until crumbly. Press into the bottom and 1 inch up the sides of an ungreased 13x9 inch baking pan. Bake 25 minutes.",
+    "Place the cream cheese, eggs, evaporated milk, granulated sugar, flour, lemon juice, lemon peel and food coloring in a blender. Cover and blend until smooth. Pour into the partially baked crust.",
+    "Bake 15 minutes or until set. Cool on a wire rack.",
+    "Spread the sour cream over the top. Refrigerate, then cut into bars."
+   ],
+   "items": [
+    "flour",
+    "powsugar",
+    "butter",
+    "creamcheese",
+    "eggs",
+    "evapmilk",
+    "sugar",
+    "lemons",
+    "sourcream"
+   ],
+   "submittedAt": "11/16/2026 19:43:19"
+  },
+  {
+   "id": "mimi-roasted-garlic-teriyaki-chicken",
+   "title": "Roasted Garlic Teriyaki Chicken",
+   "from": "Mimi Glenna",
+   "sharedBy": "Donna \"Giggle\"",
+   "type": "dinner",
+   "meat": "chicken",
+   "servings": "Makes 6 servings",
+   "note": "Typed from a photo that came with Mimi's lemon bars submission.",
+   "ingredients": [
+    "2/3 cup Kikkoman Roasted Garlic Teriyaki Marinade & Sauce",
+    "1 tablespoon brown sugar, packed",
+    "1 tablespoon vegetable oil",
+    "6 boneless, skinless chicken breast halves"
+   ],
+   "steps": [
+    "Combine the teriyaki sauce, brown sugar and oil, stirring until the sugar dissolves.",
+    "Pour the mixture over the chicken in a large plastic food storage bag. Press the air out and close the top securely. Turn the bag over several times to coat the chicken.",
+    "Refrigerate 2 hours, turning the bag over once.",
+    "Remove the chicken from the marinade and discard the marinade.",
+    "Grill the chicken 4 to 5 inches from hot coals 12 to 15 minutes, or until no longer pink in the center, turning over occasionally."
+   ],
+   "items": [
+    "teriyaki",
+    "brownsugar",
+    "oil",
+    "chicken"
+   ],
+   "submittedAt": "11/16/2026 19:43:19"
+  },
+  {
+   "id": "mimi-torta-italiano",
+   "title": "Torta Italiano",
+   "from": "Mimi Glenna",
+   "sharedBy": "Donna \"Giggle\"",
+   "type": "other",
+   "servings": "Makes 8 servings",
+   "note": "A layered turkey, spinach and cheese bake from a photo that came with Mimi's lemon bars submission. It uses ground turkey, which the planner has no toggle for, so the planner won't pick it. Choose it from the family recipe slot on any day.",
+   "ingredients": [
+    "2 cups reduced-fat all-purpose baking mix",
+    "1/2 cup skim milk",
+    "1/2 cup onion, chopped",
+    "1 pound lean ground turkey",
+    "1 large garlic clove, pressed",
+    "1 teaspoon Italian seasoning",
+    "1/8 teaspoon salt",
+    "1/8 teaspoon ground black pepper",
+    "1 can (8 ounces) tomato sauce",
+    "1 package (10 ounces) frozen chopped spinach, thawed and drained",
+    "1 cup (4 ounces) shredded part-skim mozzarella cheese",
+    "1/2 ounce fresh Parmesan cheese, grated (about 2 tablespoons)"
+   ],
+   "steps": [
+    "Preheat oven to 350°F. Lightly spray a springform pan with vegetable oil.",
+    "Combine the baking mix and milk. Roll the dough evenly over the flat bottom of the pan.",
+    "Cook the turkey, onion and garlic in a large skillet over medium heat 8-10 minutes, or until the turkey is no longer pink. Drain.",
+    "Sprinkle with the Italian seasoning, salt and pepper. Stir in the tomato sauce. Reduce the heat to low and simmer 5 minutes.",
+    "Spread the turkey mixture over the dough. Top evenly with the spinach, then the mozzarella, then grate the Parmesan over the top.",
+    "Bake 30-35 minutes. Remove from the oven and cool 10 minutes.",
+    "Run a knife gently around the inside of the pan collar before removing. Cut into 8 wedges and serve."
+   ],
+   "items": [
+    "bakingmix",
+    "milk",
+    "onions",
+    "groundturkey",
+    "garlic",
+    "italian",
+    "salt",
+    "pepper",
+    "tomsauce",
+    "spinach",
+    "mozzarella",
+    "parmesan"
+   ],
+   "submittedAt": "11/16/2026 19:43:19"
   }
  ]
 }
